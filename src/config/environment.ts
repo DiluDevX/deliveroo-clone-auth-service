@@ -31,7 +31,7 @@ interface Environment {
   logging: {
     level: string;
   };
-  bffAPIKey: string;
+  deliverooCloneAPIKey: string;
   serviceName: string;
   mail: MailConfig;
   rateLimit: RateLimitConfig;
@@ -140,7 +140,7 @@ export const environment: Environment = {
   logging: {
     level: optionalEnv('LOG_LEVEL', 'info'),
   },
-  bffAPIKey: requireEnv('BFF_API_KEY'),
+  deliverooCloneAPIKey: requireEnv('DELIVEROO_CLONE_API_KEY'),
   mail: loadMailConfig(environment_raw),
   rateLimit: loadRateLimitConfig(environment_raw),
   serviceName: requireEnv('SERVICE_NAME'),

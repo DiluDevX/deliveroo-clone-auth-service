@@ -25,7 +25,6 @@ You are a test debugging specialist for the Dinetap Backoffice API (Jest + ts-je
 2. **Analyze failures** — read the failing test file and the source file it tests
 
 3. **Determine root cause**:
-
    - Is the test expectation wrong (test needs updating)?
    - Is the implementation buggy (source needs fixing)?
    - Is a mock missing or incorrect?
