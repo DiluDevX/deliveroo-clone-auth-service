@@ -105,16 +105,15 @@ export const updateUserPartially = async (
 };
 
 export const softDeleteUser = async (userId: string) => {
-  const { softDeleteUserWithCascade } = await import('./userLifecycle.service');
-
-  // Get user and cascade soft delete to related records
-  await softDeleteUserWithCascade(userId);
-
-  // Perform soft delete by setting deletedAt timestamp
-  await prisma.user.update({
+  const deleteUser = prisma.user.update({
     where: { id: userId },
     data: { deletedAt: new Date() },
   });
 
-  return { success: true };
+  const deleteAllRestaurantUsers = prisma.restaurantUser.updateMany({
+    where: { userId: userId },
+    data: { deletedAt: new Date() },
+  });
+
+  await prisma.$transaction([deleteUser, deleteAllRestaurantUsers]);
 };

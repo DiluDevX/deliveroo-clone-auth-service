@@ -5,16 +5,8 @@ export const idRequestPathParamsSchema = z.object({
 });
 
 export const commonRequestQueryParamsSchema = z.object({
-  page: z
-    .string()
-    .optional()
-    .transform((val) => (val ? Number.parseInt(val, 10) : 1))
-    .pipe(z.number().int().positive()),
-  limit: z
-    .string()
-    .optional()
-    .transform((val) => (val ? Number.parseInt(val, 10) : 10))
-    .pipe(z.number().int().positive().max(100)),
+  page: z.string().optional(),
+  limit: z.string().optional(),
   sortBy: z.string().optional(),
   sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
 });

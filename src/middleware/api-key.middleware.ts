@@ -1,37 +1,33 @@
-import { NextFunction, Request, Response } from 'express';
-import { timingSafeEqual } from 'node:crypto';
-import { environment } from '../config/environment';
-import StatusCodes from 'http-status-codes';
+import { Request, Response, NextFunction } from 'express';
+import { timingSafeEqual } from 'crypto';
+import { UnauthorizedError } from '../utils/errors';
 
-function constantTimeCompare(providedValue: string, expectedValue: string): boolean {
-  const expectedBuffer = Buffer.from(expectedValue);
-  const providedBuffer = Buffer.alloc(expectedBuffer.length);
+const API_KEY_HEADER = 'x-api-key';
 
-  providedBuffer.write(providedValue);
+export function apiKeyMiddleware(req: Request, _res: Response, next: NextFunction): void {
+  const apiKey = process.env.API_KEY;
 
-  try {
-    return timingSafeEqual(providedBuffer, expectedBuffer);
-  } catch {
-    return false;
-  }
-}
-
-export function apiKeyMiddleware(req: Request, res: Response, next: NextFunction) {
-  try {
-    const providedApiKey = req.header('api-key') || '';
-    const expectedApiKey = environment.authApiKey;
-
-    const isValid = constantTimeCompare(providedApiKey, expectedApiKey);
-
-    if (!isValid) {
-      return res.status(StatusCodes.UNAUTHORIZED).json({
-        success: false,
-        message: 'Unauthorized',
-      });
-    }
-
+  if (!apiKey) {
+    // If no API key is configured, skip validation
     return next();
-  } catch (e) {
-    return next(e);
   }
+
+  const providedKey = req.headers[API_KEY_HEADER];
+
+  if (!providedKey || typeof providedKey !== 'string') {
+    return next(new UnauthorizedError('API key is required'));
+  }
+
+  // Use timing-safe comparison to prevent timing attacks
+  const expectedBuffer = Buffer.from(apiKey, 'utf8');
+  const providedBuffer = Buffer.from(providedKey, 'utf8');
+
+  if (
+    expectedBuffer.length !== providedBuffer.length ||
+    !timingSafeEqual(expectedBuffer, providedBuffer)
+  ) {
+    return next(new UnauthorizedError('Invalid API key'));
+  }
+
+  next();
 }

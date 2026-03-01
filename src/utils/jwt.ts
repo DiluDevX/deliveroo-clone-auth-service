@@ -1,6 +1,6 @@
 import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken';
 import { environment } from '../config/environment';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 
 export interface TokenPayload extends JwtPayload {
   userId: string;

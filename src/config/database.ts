@@ -1,6 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { logger } from '../utils/logger';
-import { environment, EnvironmentEnum } from './environment';
+import { environment } from './environment';
+import { EnvironmentEnum, PRISMA_CODE } from '../utils/constants';
 
 declare global {
   var prisma: PrismaClient | undefined;
@@ -18,12 +19,33 @@ export async function connectDatabase(): Promise<void> {
     await prisma.$connect();
     logger.info('Database connected successfully');
   } catch (error) {
-    console.error('Failed to connect to database', error);
+    logger.error({ error }, 'Failed to connect to database');
     throw error;
   }
 }
 
 export async function disconnectDatabase(): Promise<void> {
-  await prisma.$disconnect();
-  logger.info('Database disconnected');
+  try {
+    await prisma.$disconnect();
+    logger.info('Database disconnected successfully');
+  } catch (error) {
+    logger.error({ error }, 'Failed to disconnect from database');
+    throw error;
+  }
 }
+
+export async function checkDatabaseConnection(): Promise<'connected' | 'disconnected'> {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    return 'connected';
+  } catch {
+    return 'disconnected';
+  }
+}
+
+export const isPrismaErrorWithCode = (
+  error: unknown,
+  code: (typeof PRISMA_CODE)[keyof typeof PRISMA_CODE]
+): error is Prisma.PrismaClientKnownRequestError => {
+  return error instanceof Prisma.PrismaClientKnownRequestError && error.code === code;
+};

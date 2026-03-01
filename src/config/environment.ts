@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import { EnvironmentEnum } from '../utils/constants';
 dotenv.config();
 
 interface MailConfig {
@@ -15,29 +16,22 @@ interface RateLimitConfig {
   max: number;
 }
 
-export enum EnvironmentEnum {
-  Development = 'development',
-  Production = 'production',
-  Test = 'test',
-}
-
 interface Environment {
   port: number;
   env: EnvironmentEnum;
   databaseUrl: string;
+  baseUrl: string;
+  version: string;
   jwt: {
     secret: string;
     expiresInMinutes: number;
     refreshExpiresInDays: number;
     resetPasswordExpiresInHours: number;
   };
-  auth: {
-    serviceUrl: string;
-  };
   logging: {
     level: string;
   };
-  authApiKey: string;
+  bffAPIKey: string;
   serviceName: string;
   mail: MailConfig;
   rateLimit: RateLimitConfig;
@@ -128,7 +122,9 @@ const environment_raw = rawEnv as EnvironmentEnum;
 export const environment: Environment = {
   port: parsePositiveInt(optionalEnv('PORT', '3000'), 'PORT'),
   env: environment_raw,
+  version: optionalEnv('APP_VERSION', '1.0.0'),
   databaseUrl: requireEnv('DATABASE_URL'),
+  baseUrl: optionalEnv('BASE_URL', 'http://localhost:3000'),
   jwt: {
     secret: requireEnv('JWT_SECRET'),
     expiresInMinutes: parsePositiveInt(optionalEnv('JWT_EXPIRES_IN', '15'), 'JWT_EXPIRES_IN'),
@@ -141,13 +137,10 @@ export const environment: Environment = {
       'JWT_RESET_PASSWORD_EXPIRES_IN'
     ),
   },
-  auth: {
-    serviceUrl: optionalEnv('AUTH_SERVICE_URL', 'http://localhost:3001'),
-  },
   logging: {
     level: optionalEnv('LOG_LEVEL', 'info'),
   },
-  authApiKey: requireEnv('AUTH_API_KEY'),
+  bffAPIKey: requireEnv('BFF_API_KEY'),
   mail: loadMailConfig(environment_raw),
   rateLimit: loadRateLimitConfig(environment_raw),
   serviceName: requireEnv('SERVICE_NAME'),
