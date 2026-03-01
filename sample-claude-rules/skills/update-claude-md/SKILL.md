@@ -32,11 +32,13 @@ Update CLAUDE.md when:
 2. **Identify what changed** based on user's description: $ARGUMENTS
 
 3. **Find relevant examples** in the codebase to validate changes:
+
    - Search for new patterns with Grep
    - Find new files/directories with Glob
    - Read representative files to understand conventions
 
 4. **Update CLAUDE.md sections**:
+
    - Keep existing structure
    - Add/update relevant sections only
    - Keep it concise (Claude reads this on every session start)

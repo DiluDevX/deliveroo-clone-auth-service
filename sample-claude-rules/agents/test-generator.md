@@ -61,6 +61,7 @@ Also read the project's rules and conventions:
 Before writing tests, set up:
 
 1. **Mock data factory** — create `createMock<Entity>` helper with realistic data:
+
    - Use `@faker-js/faker` for all generated values
    - Use realistic values: proper UUIDs, real currency codes, plausible amounts, valid emails, real-looking names
    - Never use placeholder data like "Test Item 1", "test@test.com", or "12345"

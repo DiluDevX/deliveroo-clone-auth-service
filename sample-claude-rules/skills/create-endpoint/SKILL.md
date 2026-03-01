@@ -32,6 +32,7 @@ Scaffold a new API endpoint following the project's established patterns.
 4. **Register the route** in `src/routes/v1/index.ts` (or the appropriate version).
 
 5. **Follow conventions:**
+
    - File naming: `kebab-case`
    - DTO naming: `<Action><Resource>RequestBodyDTO`, `<Action><Resource>ResponseBodyDTO`
    - Controller signature: `async (req: Request<Params, ResBody, ReqBody, Query>, res: Response, next: NextFunction)`

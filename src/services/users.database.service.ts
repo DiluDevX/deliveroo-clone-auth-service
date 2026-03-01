@@ -41,14 +41,17 @@ export const findOneWithoutPassword = async (
 export const findOneWithPassword = async (
   where: Prisma.UserWhereUniqueInput | { email: string }
 ): Promise<User | null> => {
-  return prisma.user.findUnique({
-    where: where as Prisma.UserWhereUniqueInput,
+  return prisma.user.findFirst({
+    where: {
+      ...where,
+      deletedAt: null,
+    } as Prisma.UserWhereInput,
   });
 };
 
 export const findUserById = async (id: string): Promise<User | null> => {
-  return prisma.user.findUnique({
-    where: { id },
+  return prisma.user.findFirst({
+    where: { id, deletedAt: null },
   });
 };
 

@@ -233,7 +233,6 @@ export const forgotPassword = async (
 
     const foundUser = await usersDatabaseService.findOneWithoutPassword({
       email: req.body.email,
-      deletedAt: null,
     });
 
     logger.info({ userId: foundUser?.id }, 'User found');
