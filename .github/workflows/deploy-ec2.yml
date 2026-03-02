@@ -96,6 +96,12 @@ jobs:
             echo "$ECR_PASSWORD" | docker login --username AWS --password-stdin "$ECR_REGISTRY"
             docker pull "$IMAGE_URI"
 
+            # Stop old container BEFORE starting new one to free port 80 (keep container for rollback)
+            if [ -n "$OLD_CONTAINER_ID" ]; then
+              echo "Stopping old container: $OLD_CONTAINER_ID"
+              docker stop "$OLD_CONTAINER_ID" >/dev/null 2>&1 || true
+            fi
+
             # Start new container
             NEW_CONTAINER_ID=$(docker run -d \
               --name "${CONTAINER_NAME}-new" \
@@ -126,12 +132,6 @@ jobs:
             while [ $ELAPSED -lt $HEALTH_CHECK_TIMEOUT ]; do
               if docker exec "$NEW_CONTAINER_ID" curl -sf http://localhost:3000/health >/dev/null 2>&1; then
                 echo "✓ Health check passed!"
-                
-                # Kill old container if it exists
-                if [ -n "$OLD_CONTAINER_ID" ]; then
-                  echo "Removing old container: $OLD_CONTAINER_ID"
-                  docker rm -f "$OLD_CONTAINER_ID" || true
-                fi
 
                 # Rename new container to production name
                 docker rename "${CONTAINER_NAME}-new" "$CONTAINER_NAME"
@@ -144,18 +144,15 @@ jobs:
               ELAPSED=$((ELAPSED + HEALTH_CHECK_INTERVAL))
             done
 
-            # Health check timeout - rollback
+            # Health check timeout - rollback to old container
             echo "✗ Health check failed after ${HEALTH_CHECK_TIMEOUT}s. Rolling back..."
             docker rm -f "$NEW_CONTAINER_ID" || true
 
             if [ -n "$OLD_CONTAINER_ID" ]; then
               echo "Restarting old container: $OLD_CONTAINER_ID"
-              docker start "$OLD_CONTAINER_ID"
-              exit 1
-            else
-              echo "✗ No old container to rollback to!"
-              exit 1
+              docker start "$OLD_CONTAINER_ID" || true
             fi
+            exit 1
 
       - name: Notify deployment failure
         if: failure() && steps.deploy.outcome == 'failure'

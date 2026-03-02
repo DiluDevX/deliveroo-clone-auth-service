@@ -40,7 +40,11 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        run: npm i
+        run: npm ci
+
+      - name: Generate Prisma Client
+        if: matrix.check.name == 'Types'
+        run: npm run prisma:generate
 
       - name: Run ${{ matrix.check.name }} check
         run: ${{ matrix.check.command }}

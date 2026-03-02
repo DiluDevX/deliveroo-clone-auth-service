@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ForbiddenError } from '../utils/errors';
-import { AuthenticatedRequest } from './auth.middleware';
+import { AuthenticatedRequest } from './authentication.middleware';
 
 export function requireRoles(...allowedRoles: string[]) {
   return (req: Request, _res: Response, next: NextFunction): void => {

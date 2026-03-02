@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import * as userController from '../../controllers/v1/user.controller';
 import { validateBody, validateParams } from '../../middleware/validate.middleware';
-import { authenticateJwt } from '../../middleware/auth.middleware';
-import { requireRoles, requireOwnerOrRoles } from '../../middleware/role.middleware';
+import { authenticateJwt } from '../../middleware/authentication.middleware';
+import { requireRoles, requireOwnerOrRoles } from '../../middleware/authorization.middleware';
 import { idRequestPathParamsSchema } from '../../schema/common.schema';
 import { createUserRequestBodySchema, updateUserRequestBodySchema } from '../../schema/user.schema';
 
