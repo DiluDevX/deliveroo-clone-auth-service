@@ -91,7 +91,7 @@ jobs:
 
             IMAGE_URI="$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
             CONTAINER_NAME="deliveroo-auth-service"
-            OLD_CONTAINER_ID=$(docker ps -q -f name="$CONTAINER_NAME" 2>/dev/null || echo "")
+            OLD_CONTAINER_ID=$(docker ps -q -f name="^${CONTAINER_NAME}$" 2>/dev/null || echo "")
 
             echo "$ECR_PASSWORD" | docker login --username AWS --password-stdin "$ECR_REGISTRY"
             docker pull "$IMAGE_URI"

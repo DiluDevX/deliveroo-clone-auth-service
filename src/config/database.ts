@@ -1,4 +1,5 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '../../generated/prisma/client.js';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { logger } from '../utils/logger';
 import { environment } from './environment';
 import { EnvironmentEnum, PRISMA_CODE } from '../utils/constants';
@@ -7,8 +8,9 @@ declare global {
   var prisma: PrismaClient | undefined;
 }
 
-// Prevent multiple instances during hot reload in development
-export const prisma = globalThis.prisma || new PrismaClient();
+const adapter = new PrismaPg({ connectionString: environment.databaseUrl });
+
+export const prisma = globalThis.prisma || new PrismaClient({ adapter });
 
 if (environment.env !== EnvironmentEnum.Production) {
   globalThis.prisma = prisma;
