@@ -79,13 +79,13 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           DELIVEROO_CLONE_API_KEY: ${{ secrets.DELIVEROO_CLONE_API_KEY }}
-          SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
-          COMPANY_NAME: ${{ secrets.COMPANY_NAME }}
-          COMPANY_EMAIL: ${{ secrets.COMPANY_EMAIL }}
-          LOGO_URL: ${{ secrets.LOGO_URL }}
-          SUPPORT_EMAIL: ${{ secrets.SUPPORT_EMAIL }}
-          APP_URL: ${{ secrets.APP_URL }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          SERVICE_NAME: 'deliveroo-clone-auth-service'
+          COMPANY_NAME: 'Deliveroo Clone'
+          COMPANY_EMAIL: 'noreply@deliveroo-clone.com'
+          LOGO_URL: 'https://via.placeholder.com/200?text=Deliveroo'
+          SUPPORT_EMAIL: 'support@deliveroo-clone.com'
+          APP_URL: 'https://deliveroo-clone-prod.dilum.me'
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
