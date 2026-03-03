@@ -1,6 +1,9 @@
 name: Deploy To EC2
 
 on:
+  push:
+    branches:
+      - main
   release:
     types: [published]
   workflow_dispatch:
@@ -15,11 +18,10 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && (github.ref_name == 'main' || github.ref_name == 'develop'))
+    if: github.event_name == 'release' || (github.event_name == 'push' && github.ref_name == 'main') || (github.event_name == 'workflow_dispatch' && github.ref_name == 'main')
     environment:
-      name: ${{ github.event_name == 'release' && github.event.release.prerelease && 'development' || (github.ref_name == 'develop' && 'development' || 'production') }}
+      name: production
     env:
-      DEPLOY_ENV: ${{ github.event_name == 'release' && github.event.release.prerelease && 'development' || (github.ref_name == 'develop' && 'development' || 'production') }}
       APP_VERSION: ${{ github.event_name == 'release' && github.event.release.tag_name || github.sha }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
       ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
@@ -27,6 +29,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Prisma migrations
+        run: npm run prisma:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
@@ -48,14 +58,10 @@ jobs:
           context: .
           push: true
           build-args: |
-            ENV=${{ env.DEPLOY_ENV }}
             APP_VERSION=${{ env.APP_VERSION }}
-          secrets: |
-            doppler_token=${{ secrets.DOPPLER_TOKEN }}
-            database_url=${{ secrets.DATABASE_URL }}
           tags: |
             ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.APP_VERSION }}
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.DEPLOY_ENV }}-latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -66,50 +72,115 @@ jobs:
 
       - name: Pull and run on EC2
         uses: appleboy/ssh-action@v1.2.5
+        id: deploy
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ env.APP_VERSION }}
-          DEPLOY_ENV: ${{ env.DEPLOY_ENV }}
-          APP_VERSION: ${{ env.APP_VERSION }}
-          AWS_REGION: ${{ env.AWS_REGION }}
           ECR_PASSWORD: ${{ steps.ecr-password.outputs.password }}
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+          SERVICE_NAME: 'auth-service'
+          COMPANY_NAME: 'Deliveroo Clone'
+          COMPANY_EMAIL: 'noreply@deliveroo-clone.com'
+          LOGO_URL: 'https://via.placeholder.com/200?text=Deliveroo'
+          SUPPORT_EMAIL: 'support@deliveroo-clone.com'
+          APP_URL: 'https://deliveroo-clone-prod.dilum.me'
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
-          envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,DEPLOY_ENV,APP_VERSION,AWS_REGION,ECR_PASSWORD,DOPPLER_TOKEN
+          envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,ECR_PASSWORD,SERVICE_NAME,COMPANY_NAME,COMPANY_EMAIL,LOGO_URL,SUPPORT_EMAIL,APP_URL
           script: |
             set -eu
 
             IMAGE_URI="$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+            CONTAINER_NAME="deliveroo-auth-service"
+            OLD_CONTAINER_ID=$(docker ps -q -f name="^${CONTAINER_NAME}$" 2>/dev/null || echo "")
 
             echo "$ECR_PASSWORD" | docker login --username AWS --password-stdin "$ECR_REGISTRY"
             docker pull "$IMAGE_URI"
 
-            docker rm -f deliveroo-auth-service >/dev/null 2>&1 || true
+            # Stop old container BEFORE starting new one to free port 80 (keep container for rollback)
+            if [ -n "$OLD_CONTAINER_ID" ]; then
+              echo "Stopping old container: $OLD_CONTAINER_ID"
+              docker stop "$OLD_CONTAINER_ID" >/dev/null 2>&1 || true
+            fi
 
-             # Map DEPLOY_ENV to Doppler config names (dev/prd)
-             if [ "$DEPLOY_ENV" = "development" ]; then
-               DOPPLER_CONFIG="dev"
-             elif [ "$DEPLOY_ENV" = "production" ]; then
-               DOPPLER_CONFIG="prd"
-             else
-               echo "Error: Invalid DEPLOY_ENV value: $DEPLOY_ENV"
-               echo "Expected: 'development' or 'production'"
-               exit 1
-             fi
+            # Load secrets from AWS Parameter Store
+            source /home/ec2-user/fetch-secrets.sh
 
-             docker run -d \
-               --name deliveroo-auth-service \
-               --restart unless-stopped \
-               -p 80:3000 \
-               -e NODE_ENV="$DEPLOY_ENV" \
-               -e APP_VERSION="$APP_VERSION" \
-               -e DOPPLER_TOKEN="$DOPPLER_TOKEN" \
-               -e DOPPLER_CONFIG="$DOPPLER_CONFIG" \
-               -e SERVICE_NAME="auth-service" \
-               -e PORT="3000" \
-               "$IMAGE_URI"
+            # Start new container with error handling
+            set +e
+            NEW_CONTAINER_ID=$(docker run -d \
+              --name "${CONTAINER_NAME}-new" \
+              --restart unless-stopped \
+              -p 80:3000 \
+              -e NODE_ENV="production" \
+              -e PORT="3000" \
+              -e APP_VERSION="$IMAGE_TAG" \
+              -e DATABASE_URL="$DATABASE_URL" \
+              -e JWT_SECRET="$JWT_SECRET" \
+              -e DELIVEROO_CLONE_API_KEY="$DELIVEROO_CLONE_API_KEY" \
+              -e SERVICE_NAME="$SERVICE_NAME" \
+              -e COMPANY_NAME="$COMPANY_NAME" \
+              -e COMPANY_EMAIL="$COMPANY_EMAIL" \
+              -e LOGO_URL="$LOGO_URL" \
+              -e SUPPORT_EMAIL="$SUPPORT_EMAIL" \
+              -e APP_URL="$APP_URL" \
+              -e RESEND_API_KEY="$RESEND_API_KEY" \
+              "$IMAGE_URI" 2>&1)
+            DOCKER_RUN_STATUS=$?
+            set -e
+
+            if [ $DOCKER_RUN_STATUS -ne 0 ]; then
+              echo "✗ Failed to start new container: $NEW_CONTAINER_ID"
+              # Cleanup any partial container
+              docker rm -f "${CONTAINER_NAME}-new" 2>/dev/null || true
+              # Restart old container if it exists
+              if [ -n "$OLD_CONTAINER_ID" ]; then
+                echo "Restarting old container: $OLD_CONTAINER_ID"
+                docker start "$OLD_CONTAINER_ID" || true
+              fi
+              exit 1
+            fi
+
+            echo "New container ID: $NEW_CONTAINER_ID"
+
+            # Health check: wait for container to be healthy (max 30 seconds)
+            HEALTH_CHECK_INTERVAL=2
+            HEALTH_CHECK_TIMEOUT=30
+            ELAPSED=0
+
+            while [ $ELAPSED -lt $HEALTH_CHECK_TIMEOUT ]; do
+              # Health check from host (container exposes port 80)
+              if curl -sf http://localhost:80/ >/dev/null 2>&1; then
+                echo "✓ Health check passed!"
+
+                # Remove old container with production name if it exists
+                docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
+                # Rename new container to production name
+                docker rename "${CONTAINER_NAME}-new" "$CONTAINER_NAME"
+                echo "✓ Deployment successful!"
+                exit 0
+              fi
+
+              echo "Health check failed, retrying in ${HEALTH_CHECK_INTERVAL}s... ($ELAPSED/${HEALTH_CHECK_TIMEOUT}s)"
+              sleep $HEALTH_CHECK_INTERVAL
+              ELAPSED=$((ELAPSED + HEALTH_CHECK_INTERVAL))
+            done
+
+            # Health check timeout - rollback to old container
+            echo "✗ Health check failed after ${HEALTH_CHECK_TIMEOUT}s. Rolling back..."
+            docker rm -f "$NEW_CONTAINER_ID" || true
+
+            if [ -n "$OLD_CONTAINER_ID" ]; then
+              echo "Restarting old container: $OLD_CONTAINER_ID"
+              docker start "$OLD_CONTAINER_ID" || true
+            fi
+            exit 1
+
+      - name: Notify deployment failure
+        if: failure() && steps.deploy.outcome == 'failure'
+        run: |
+          echo "❌ Deployment failed and rolled back to previous version"
+          exit 1

@@ -1,4 +1,4 @@
-import { PasswordResetToken } from '@prisma/client';
+import { PasswordResetToken } from '../../generated/prisma/client';
 import { prisma } from '../config/database';
 import { hashToken } from '../utils/jwt';
 import dayjs from 'dayjs';

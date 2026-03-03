@@ -1,4 +1,4 @@
-import { Prisma, User } from '@prisma/client';
+import { Prisma, User } from '../../generated/prisma/client';
 import { prisma } from '../config/database';
 import { NotFoundError } from '../utils/errors';
 import { hashPassword } from '../utils/password';
@@ -41,14 +41,17 @@ export const findOneWithoutPassword = async (
 export const findOneWithPassword = async (
   where: Prisma.UserWhereUniqueInput | { email: string }
 ): Promise<User | null> => {
-  return prisma.user.findUnique({
-    where: where as Prisma.UserWhereUniqueInput,
+  return prisma.user.findFirst({
+    where: {
+      ...where,
+      deletedAt: null,
+    } as Prisma.UserWhereInput,
   });
 };
 
 export const findUserById = async (id: string): Promise<User | null> => {
-  return prisma.user.findUnique({
-    where: { id },
+  return prisma.user.findFirst({
+    where: { id, deletedAt: null },
   });
 };
 
@@ -105,16 +108,23 @@ export const updateUserPartially = async (
 };
 
 export const softDeleteUser = async (userId: string) => {
-  const { softDeleteUserWithCascade } = await import('./userLifecycle.service');
-
-  // Get user and cascade soft delete to related records
-  await softDeleteUserWithCascade(userId);
-
-  // Perform soft delete by setting deletedAt timestamp
-  await prisma.user.update({
+  const now = new Date();
+  const deleteUser = prisma.user.update({
     where: { id: userId },
-    data: { deletedAt: new Date() },
+    data: { deletedAt: now },
   });
 
-  return { success: true };
+  const deleteAllRestaurantUsers = prisma.restaurantUser.updateMany({
+    where: { userId: userId, deletedAt: null },
+    data: { deletedAt: now },
+  });
+
+  try {
+    await prisma.$transaction([deleteUser, deleteAllRestaurantUsers]);
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      throw new NotFoundError('User not found');
+    }
+    throw error;
+  }
 };

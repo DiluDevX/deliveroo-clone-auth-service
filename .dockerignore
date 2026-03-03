@@ -2,6 +2,7 @@
 .github
 .gitignore
 .env.*
+.env
 README.md
 LICENSE
 .vscode

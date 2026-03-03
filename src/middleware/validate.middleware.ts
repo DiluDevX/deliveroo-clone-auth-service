@@ -1,12 +1,10 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { ZodSchema, ZodError } from 'zod';
 import { ValidationError } from '../utils/errors';
+import { logger } from '../utils/logger';
 
 type ValidationTarget = 'body' | 'query' | 'params';
 
-/**
- * Creates a validation middleware for the specified target using a Zod schema.
- */
 function createValidator(target: ValidationTarget) {
   return (schema: ZodSchema): RequestHandler => {
     return (req: Request, _res: Response, next: NextFunction): void => {
@@ -16,17 +14,13 @@ function createValidator(target: ValidationTarget) {
         next();
       } catch (error) {
         if (error instanceof ZodError) {
-          const errors: Record<string, string[]> = {};
-
-          error.errors.forEach((err) => {
-            const path = err.path.join('.');
-            if (!errors[path]) {
-              errors[path] = [];
-            }
-            errors[path].push(err.message);
-          });
-
-          next(new ValidationError('Validation failed', errors));
+          next(new ValidationError('Validation failed'));
+          const sanitizedIssues = error.issues.map((issue) => ({
+            path: issue.path.join('.'),
+            code: issue.code,
+            message: issue.message,
+          }));
+          logger.error({ issues: sanitizedIssues }, 'Validation error');
           return;
         }
         next(error);

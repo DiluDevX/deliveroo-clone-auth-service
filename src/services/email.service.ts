@@ -1,54 +1,31 @@
 import { Resend } from 'resend';
-import { resetPasswordTemplate } from '../templates/reset-password';
+import { render } from '@react-email/components';
 import { environment } from '../config/environment';
-import { logger } from '../utils/logger';
-
-const companyName = environment.mail.companyName;
-const companyEmail = environment.mail.companyEmail;
-const logoUrl = environment.mail.logoUrl;
-const supportEmail = environment.mail.supportEmail;
-const appUrl = environment.mail.appUrl;
+import { InternalServerError } from '../utils/errors';
+import ResetPasswordEmail from '../emails/ResetPasswordEmail';
 
 const resend = new Resend(environment.mail.resendApiKey);
 
-const sendMail = async ({
-  to,
-  from,
-  subject,
-  html,
-}: {
-  from: string;
-  to: string;
-  subject: string;
-  html: string;
-}) => {
+export const sendResetPasswordEmail = async (to: string, token: string) => {
+  const resetUrl = `${environment.mail.appUrl}/account/reset-password?token=${encodeURIComponent(token)}`;
+
+  const html = await render(
+    ResetPasswordEmail({
+      resetUrl,
+      companyName: environment.mail.companyName,
+      supportEmail: environment.mail.supportEmail,
+      logoUrl: environment.mail.logoUrl,
+    })
+  );
+
   const { error } = await resend.emails.send({
-    from,
+    from: `${environment.mail.companyName} <${environment.mail.companyEmail}>`,
     to,
-    subject,
+    subject: 'Reset your password',
     html,
   });
 
   if (error) {
-    logger.error(error);
-    throw new Error('Failed to send email');
+    throw new InternalServerError('Failed to send reset password email');
   }
-  logger.info(`Email sent to ${to} with subject "${subject}"`);
-};
-
-export const sendResetPasswordEmail = async (to: string, token: string) => {
-  const resetUrl = `${appUrl}/account/reset-password?token=${encodeURIComponent(token)}`;
-  const html = resetPasswordTemplate({
-    companyName,
-    logoUrl,
-    resetUrl,
-    supportEmail,
-  });
-
-  await sendMail({
-    from: `${companyName} <${companyEmail}>`,
-    to,
-    subject: `Reset Your ${companyName} Password`,
-    html,
-  });
 };

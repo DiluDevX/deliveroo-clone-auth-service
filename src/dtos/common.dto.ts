@@ -1,19 +1,29 @@
-import z from 'zod';
+import { z } from 'zod';
 import { commonRequestQueryParamsSchema, idRequestPathParamsSchema } from '../schema/common.schema';
 
-export type CommonResponseDTO<T> = {
+export interface CommonResponseDTO<T = unknown> {
   success: boolean;
   message: string;
   data?: T;
-};
+}
+
+export interface PaginationInfoDTO {
+  page?: number;
+  limit?: number;
+  totalPages?: number;
+  total: number;
+}
 
 export type HealthCheckResponseBodyDTO = {
   db: 'connected' | 'disconnected' | 'unknown';
   version: string;
-  timestamp: Date;
+  timestamp: string;
   service: string;
 };
 
-// Type exports for use in controllers/services
+export interface PaginatedResponseDTO<T = unknown> extends CommonResponseDTO<T[]> {
+  pagination: PaginationInfoDTO;
+}
+
 export type IdRequestPathParamsDTO = z.infer<typeof idRequestPathParamsSchema>;
 export type CommonRequestQueryParamsDTO = z.infer<typeof commonRequestQueryParamsSchema>;

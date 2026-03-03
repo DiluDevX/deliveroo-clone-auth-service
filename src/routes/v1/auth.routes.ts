@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import * as authController from '../controllers/auth.controller';
-import { validateBody } from '../middleware/validate.middleware';
+import * as authController from '../../controllers/v1/auth.controller';
+import { validateBody } from '../../middleware/validate.middleware';
 import {
   checkEmailRequestBodySchema,
   forgotPasswordRequestBodySchema,
@@ -10,8 +10,7 @@ import {
   verifyResetPasswordTokenRequestBodySchema,
   signUpRequestBodySchema,
   resetPasswordRequestBodySchema,
-} from '../schema/auth.schema';
-import { rateLimiterMiddleware } from '../middleware/rate-limiter.middleware';
+} from '../../schema/auth.schema';
 
 const router = Router();
 
@@ -19,21 +18,11 @@ router.post('/check-email', validateBody(checkEmailRequestBodySchema), authContr
 
 router.post('/signup', validateBody(signUpRequestBodySchema), authController.signup);
 
-router.post(
-  '/login',
-  rateLimiterMiddleware,
-  validateBody(loginRequestBodySchema),
-  authController.login
-);
+router.post('/login', validateBody(loginRequestBodySchema), authController.login);
 
 router.post('/logout', validateBody(logoutRequestBodySchema), authController.logout);
 
-router.post(
-  '/refresh',
-  rateLimiterMiddleware,
-  validateBody(refreshTokenRequestBodySchema),
-  authController.refreshToken
-);
+router.post('/refresh', validateBody(refreshTokenRequestBodySchema), authController.refreshToken);
 
 router.post(
   '/forgot-password',
@@ -43,14 +32,12 @@ router.post(
 
 router.post(
   '/reset-password/verify',
-  rateLimiterMiddleware,
   validateBody(verifyResetPasswordTokenRequestBodySchema),
   authController.verifyResetPasswordToken
 );
 
 router.post(
   '/reset-password/update',
-  rateLimiterMiddleware,
   validateBody(resetPasswordRequestBodySchema),
   authController.resetPassword
 );

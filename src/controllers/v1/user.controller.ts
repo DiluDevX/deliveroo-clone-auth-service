@@ -7,12 +7,12 @@ import type {
   DeleteUserResponseBodyDTO,
   CreateUserRequestBodyDTO,
   CreateUserResponseBodyDTO,
-} from '../dtos/user.dto';
-import { CommonResponseDTO, IdRequestPathParamsDTO } from '../dtos/common.dto';
-import * as usersDatabaseService from '../services/users.database.service';
-import { ConflictError, NotFoundError } from '../utils/errors';
+} from '../../dtos/user.dto';
+import { CommonResponseDTO, IdRequestPathParamsDTO } from '../../dtos/common.dto';
+import * as usersDatabaseService from '../../services/users.database.service';
+import { ConflictError, NotFoundError } from '../../utils/errors';
 import { StatusCodes } from 'http-status-codes';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 export const getAllUsers = async (
   _req: Request, // TODO: add query params for filtering, pagination, etc.
@@ -78,7 +78,7 @@ export const createUser = async (
       email: req.body.email,
     });
 
-    if (existingUser && !existingUser.deletedAt) {
+    if (existingUser) {
       throw new ConflictError('Email is already in use');
     }
     logger.info({ role: 'user' }, 'Creating new user');
@@ -143,11 +143,11 @@ export const deleteUser = async (
   try {
     const userId = req.params.id;
     await usersDatabaseService.softDeleteUser(userId);
+    logger.info({ userId }, 'User deleted successfully');
     res.status(StatusCodes.OK).json({
       success: true,
       message: 'User deleted successfully',
     });
-    logger.info({ userId }, 'User deleted successfully');
   } catch (error) {
     logger.error(
       { error: error instanceof Error ? error.message : 'Unknown error' },

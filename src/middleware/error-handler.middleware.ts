@@ -1,27 +1,22 @@
 import { NextFunction, Request, Response } from 'express';
-import { AppError, ValidationError } from '../utils/errors';
+import { AppError } from '../utils/errors';
 import { logger } from '../utils/logger';
-import { environment, EnvironmentEnum } from '../config/environment';
-import { Prisma } from '@prisma/client';
-import StatusCodes from 'http-status-codes';
-interface ErrorResponse {
-  success: false;
-  message: string;
+import { environment } from '../config/environment';
+import { Prisma } from '../../generated/prisma/client';
+import { StatusCodes } from 'http-status-codes';
+import { EnvironmentEnum, PRISMA_CODE } from '../utils/constants';
+import { CommonResponseDTO } from '../dtos/common.dto';
+interface ErrorResponseDTO extends CommonResponseDTO {
   code?: string;
-  errors?: Record<string, string[]>;
   stack?: string;
 }
 
 function handleAppError(err: AppError, res: Response): void {
-  const response: ErrorResponse = {
+  const response: ErrorResponseDTO = {
     success: false,
     message: err.message,
     code: err.code,
   };
-
-  if (err instanceof ValidationError) {
-    response.errors = err.errors;
-  }
 
   if (environment.env !== EnvironmentEnum.Production) {
     response.stack = err.stack;
@@ -37,18 +32,15 @@ function handlePrismaError(err: Error, res: Response): boolean {
 
   const prismaError = err as Prisma.PrismaClientKnownRequestError;
 
-  if (prismaError.code === 'P2002') {
-    const target = prismaError.meta?.target;
-    const field = Array.isArray(target) ? target[0] : target;
+  if (prismaError.code === PRISMA_CODE.CONFLICT) {
     res.status(StatusCodes.CONFLICT).json({
       success: false,
       message: 'A record with this value already exists',
-      field: field,
     });
     return true;
   }
 
-  if (prismaError.code === 'P2025') {
+  if (prismaError.code === PRISMA_CODE.NOT_FOUND) {
     res.status(StatusCodes.NOT_FOUND).json({
       success: false,
       message: 'Record not found',
@@ -95,9 +87,12 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
     return;
   }
 
-  const response: ErrorResponse = {
+  const response: ErrorResponseDTO = {
     success: false,
-    message: environment.env === EnvironmentEnum.Production ? 'Internal Server Error' : err.message,
+    message:
+      environment.env === EnvironmentEnum.Production
+        ? 'Internal Server Error'
+        : (err.message ?? 'Internal Server Error'),
   };
 
   if (environment.env !== EnvironmentEnum.Production) {

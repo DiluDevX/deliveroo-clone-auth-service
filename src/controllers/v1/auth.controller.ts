@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
-import { logger } from '../utils/logger';
-import * as authService from '../services/auth.service';
-import * as refreshTokenDatabaseService from '../services/refresh-token.database.service';
-import * as resetPasswordTokenDatabaseService from '../services/reset-password-token.database.service';
-import * as usersDatabaseService from '../services/users.database.service';
-import * as emailService from '../services/email.service';
+import { logger } from '../../utils/logger';
+import * as authService from '../../services/auth.service';
+import * as refreshTokenDatabaseService from '../../services/refresh-token.database.service';
+import * as resetPasswordTokenDatabaseService from '../../services/reset-password-token.database.service';
+import * as usersDatabaseService from '../../services/users.database.service';
+import * as emailService from '../../services/email.service';
 import {
   CheckEmailRequestBodyDTO,
   CheckEmailResponseBodyDTO,
@@ -18,10 +18,10 @@ import {
   SignUpRequestBodyDTO,
   SignUpResponseBodyDTO,
   VerifyResetPasswordTokenRequestBodyDTO,
-} from '../dtos/auth.dto';
-import { CommonResponseDTO } from '../dtos/common.dto';
-import { ConflictError, NotFoundError, UnauthorizedError } from '../utils/errors';
-import { comparePasswords } from '../utils/password';
+} from '../../dtos/auth.dto';
+import { CommonResponseDTO } from '../../dtos/common.dto';
+import { ConflictError, NotFoundError, UnauthorizedError } from '../../utils/errors';
+import { comparePasswords } from '../../utils/password';
 import { StatusCodes } from 'http-status-codes';
 
 export const checkEmail = async (
@@ -233,7 +233,6 @@ export const forgotPassword = async (
 
     const foundUser = await usersDatabaseService.findOneWithoutPassword({
       email: req.body.email,
-      deletedAt: null,
     });
 
     logger.info({ userId: foundUser?.id }, 'User found');
