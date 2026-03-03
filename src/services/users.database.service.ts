@@ -108,15 +108,23 @@ export const updateUserPartially = async (
 };
 
 export const softDeleteUser = async (userId: string) => {
+  const now = new Date();
   const deleteUser = prisma.user.update({
     where: { id: userId },
-    data: { deletedAt: new Date() },
+    data: { deletedAt: now },
   });
 
   const deleteAllRestaurantUsers = prisma.restaurantUser.updateMany({
     where: { userId: userId },
-    data: { deletedAt: new Date() },
+    data: { deletedAt: now },
   });
 
-  await prisma.$transaction([deleteUser, deleteAllRestaurantUsers]);
+  try {
+    await prisma.$transaction([deleteUser, deleteAllRestaurantUsers]);
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      throw new NotFoundError('User not found');
+    }
+    throw error;
+  }
 };

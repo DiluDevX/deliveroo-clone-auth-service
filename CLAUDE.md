@@ -45,7 +45,7 @@ npm run release:dry-run      # Preview release without publishing
 
 **Layered Express architecture:** Routes → Middleware → Controllers → Services → DB
 
-```
+```text
 src/
 ├── config/          # environment.ts (typed singleton), database.ts (Prisma client)
 ├── controllers/     # common.controller.ts + v1/<domain>.controller.ts
