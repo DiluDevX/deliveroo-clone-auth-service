@@ -115,7 +115,7 @@ export const softDeleteUser = async (userId: string) => {
   });
 
   const deleteAllRestaurantUsers = prisma.restaurantUser.updateMany({
-    where: { userId: userId },
+    where: { userId: userId, deletedAt: null },
     data: { deletedAt: now },
   });
 

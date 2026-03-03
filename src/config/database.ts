@@ -2,6 +2,7 @@ import { PrismaClient } from '../../generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { logger } from '../utils/logger';
 import { environment } from './environment';
+import { EnvironmentEnum } from '../utils/constants';
 import { PRISMA_CODE } from '../utils/constants';
 
 declare global {
@@ -12,7 +13,7 @@ const adapter = new PrismaPg({ connectionString: environment.databaseUrl });
 
 export const prisma = globalThis.prisma || new PrismaClient({ adapter });
 
-if (environment.env !== 'production') {
+if (environment.env !== EnvironmentEnum.Production) {
   globalThis.prisma = prisma;
 }
 
