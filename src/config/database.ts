@@ -6,15 +6,15 @@ import { EnvironmentEnum } from '../utils/constants';
 import { PRISMA_CODE } from '../utils/constants';
 
 declare global {
-  var prisma: PrismaClient | undefined;
+  var __prisma: PrismaClient | undefined;
 }
 
 const adapter = new PrismaPg({ connectionString: environment.databaseUrl });
 
-export const prisma = globalThis.prisma || new PrismaClient({ adapter });
+export const prisma = globalThis.__prisma || new PrismaClient({ adapter });
 
 if (environment.env !== EnvironmentEnum.Production) {
-  globalThis.prisma = prisma;
+  globalThis.__prisma = prisma;
 }
 
 export async function connectDatabase(): Promise<void> {
@@ -39,7 +39,7 @@ export async function disconnectDatabase(): Promise<void> {
 
 export async function checkDatabaseConnection(): Promise<'connected' | 'disconnected'> {
   try {
-    await prisma.$connect();
+    await prisma.$queryRaw`SELECT 1`;
     return 'connected';
   } catch {
     return 'disconnected';

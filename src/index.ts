@@ -1,5 +1,5 @@
 import express, { ErrorRequestHandler } from 'express';
-import { connectDatabase, prisma } from './config/database';
+import { connectDatabase, disconnectDatabase } from './config/database';
 import { logger } from './utils/logger';
 import { environment } from './config/environment';
 import { errorHandler } from './middleware/error-handler.middleware';
@@ -51,8 +51,7 @@ async function startServer(): Promise<void> {
         });
         logger.info('HTTP server closed');
 
-        await prisma.$disconnect();
-        logger.info('Database disconnected');
+        await disconnectDatabase();
       } catch (error) {
         logger.error({ error }, 'Error during shutdown');
         process.exit(1);
