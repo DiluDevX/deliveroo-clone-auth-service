@@ -1,4 +1,4 @@
-import { RefreshToken } from '../../generated/prisma/client.js';
+import { RefreshToken } from '../../generated/prisma/client';
 import { prisma } from '../config/database';
 import { hashToken } from '../utils/jwt';
 

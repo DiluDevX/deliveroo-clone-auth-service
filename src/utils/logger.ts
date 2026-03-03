@@ -2,20 +2,30 @@ import pino from 'pino';
 import { environment } from '../config/environment';
 import { EnvironmentEnum } from './constants';
 
-export const logger = pino({
+const transportOptions = {
+  colorize: true,
+  translateTime: 'SYS:standard',
+  ignore: 'pid,hostname',
+};
+
+const pinoOptions: pino.LoggerOptions = {
   level: environment.logging.level,
-  ...(environment.env !== EnvironmentEnum.Production && {
-    transport: {
-      target: 'pino-pretty',
-      options: {
-        colorize: true,
-        translateTime: 'SYS:standard',
-        ignore: 'pid,hostname',
-      },
-    },
-  }),
   base: {
     service: environment.serviceName,
     env: environment.env,
   },
-});
+};
+
+if (environment.env !== EnvironmentEnum.Production) {
+  try {
+    require.resolve('pino-pretty');
+    (pinoOptions as { transport?: object }).transport = {
+      target: 'pino-pretty',
+      options: transportOptions,
+    };
+  } catch {
+    // pino-pretty not available
+  }
+}
+
+export const logger = pino(pinoOptions);

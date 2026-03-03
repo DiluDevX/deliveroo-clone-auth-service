@@ -3,7 +3,6 @@ import { StatusCodes } from 'http-status-codes';
 import { CommonResponseDTO, HealthCheckResponseBodyDTO } from '../dtos/common.dto';
 import { checkDatabaseConnection } from '../config/database';
 import { environment } from '../config/environment';
-import { NotFoundError } from '../utils/errors';
 
 export const healthCheck = async (
   _req: Request,
@@ -28,6 +27,9 @@ export const healthCheck = async (
   }
 };
 
-export const fallback = async (_req: Request, _res: Response, next: NextFunction) => {
-  next(new NotFoundError('Route not found'));
+export const fallback = async (_req: Request, res: Response) => {
+  res.status(StatusCodes.NOT_FOUND).json({
+    success: false,
+    message: 'Route not found',
+  });
 };

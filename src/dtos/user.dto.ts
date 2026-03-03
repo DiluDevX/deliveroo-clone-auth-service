@@ -1,6 +1,6 @@
 import z from 'zod';
 import { createUserRequestBodySchema, updateUserRequestBodySchema } from '../schema/user.schema';
-import { User } from '../../generated/prisma/client.js';
+import { User } from '../../generated/prisma/client';
 
 export type GetAllUsersResponseBodyDTO = Omit<User, 'password'>[];
 

@@ -47,4 +47,4 @@ USER app
 EXPOSE 3000
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/src/index.js"]

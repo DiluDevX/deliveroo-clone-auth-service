@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2023",
-    "module": "ESNext",
+    "module": "CommonJS",
     "lib": ["ES2021"],
     "jsx": "react",
     "jsxFactory": "React.createElement",
@@ -27,7 +27,7 @@
     "declarationMap": true,
     "sourceMap": true,
     "skipLibCheck": true,
-    "moduleResolution": "bundler"
+    "moduleResolution": "Node10"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

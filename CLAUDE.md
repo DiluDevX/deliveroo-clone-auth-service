@@ -50,12 +50,13 @@ src/
 ├── config/          # environment.ts (typed singleton), database.ts (Prisma client)
 ├── controllers/     # common.controller.ts + v1/<domain>.controller.ts
 ├── dtos/            # TypeScript interfaces inferred from Zod schemas
+├── emails/          # React Email templates
 ├── middleware/      # validate, error-handler, rate-limiter, api-key
 ├── routes/          # index.ts + common.routes.ts + v1/<domain>.routes.ts
 ├── schema/          # Zod validation schemas (common + per-domain)
 ├── services/        # <domain>.database.service.ts — all Prisma queries live here
 ├── utils/           # constants.ts, errors.ts, logger.ts
-└── server.ts        # Entry point: connect DB, start HTTP, graceful shutdown
+└── index.ts         # Entry point: connect DB, start HTTP, graceful shutdown
 ```
 
 ### Key Patterns

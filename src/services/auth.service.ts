@@ -1,7 +1,7 @@
 import { prisma } from '../config/database';
 import { generateAccessToken, generateRefreshToken, hashToken, verifyToken } from '../utils/jwt';
 import { NotFoundError, UnauthorizedError } from '../utils/errors';
-import { RefreshToken, Role, User } from '../../generated/prisma/client.js';
+import { RefreshToken, Role, User } from '../../generated/prisma/client';
 import dayjs from 'dayjs';
 import * as refreshTokenDatabaseService from './refresh-token.database.service';
 import * as usersDatabaseService from './users.database.service';

@@ -1,4 +1,4 @@
-import { Prisma, User } from '../../generated/prisma/client.js';
+import { Prisma, User } from '../../generated/prisma/client';
 import { prisma } from '../config/database';
 import { NotFoundError } from '../utils/errors';
 import { hashPassword } from '../utils/password';

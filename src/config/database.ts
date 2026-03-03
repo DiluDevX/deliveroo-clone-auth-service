@@ -1,8 +1,8 @@
-import { Prisma, PrismaClient } from '../../generated/prisma/client.js';
+import { PrismaClient } from '../../generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { logger } from '../utils/logger';
 import { environment } from './environment';
-import { EnvironmentEnum, PRISMA_CODE } from '../utils/constants';
+import { PRISMA_CODE } from '../utils/constants';
 
 declare global {
   var prisma: PrismaClient | undefined;
@@ -12,7 +12,7 @@ const adapter = new PrismaPg({ connectionString: environment.databaseUrl });
 
 export const prisma = globalThis.prisma || new PrismaClient({ adapter });
 
-if (environment.env !== EnvironmentEnum.Production) {
+if (environment.env !== 'production') {
   globalThis.prisma = prisma;
 }
 
@@ -38,7 +38,7 @@ export async function disconnectDatabase(): Promise<void> {
 
 export async function checkDatabaseConnection(): Promise<'connected' | 'disconnected'> {
   try {
-    await prisma.$queryRaw`SELECT 1`;
+    await prisma.$connect();
     return 'connected';
   } catch {
     return 'disconnected';
@@ -48,6 +48,6 @@ export async function checkDatabaseConnection(): Promise<'connected' | 'disconne
 export const isPrismaErrorWithCode = (
   error: unknown,
   code: (typeof PRISMA_CODE)[keyof typeof PRISMA_CODE]
-): error is Prisma.PrismaClientKnownRequestError => {
-  return error instanceof Prisma.PrismaClientKnownRequestError && error.code === code;
+): boolean => {
+  return typeof error === 'object' && error !== null && 'code' in error && error.code === code;
 };
