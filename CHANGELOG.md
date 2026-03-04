@@ -1,3 +1,48 @@
+# [1.0.0-beta.7](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.6...v1.0.0-beta.7) (2026-03-04)
+
+
+### Bug Fixes
+
+*  improve error handling logic; enhance request logging and HTML escaping functions ([f4d3ac6](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/f4d3ac624c3be5574ee9ce0457075606742772e3))
+* add HUSKY environment variable to Semantic Release step ([2304444](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/2304444c8480eca550501a79758d8da2a94a93bf))
+* add shebang and Husky initialization to git hooks ([c1a8d5f](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/c1a8d5f2500c1cc1b27dfc61807d7f22aaa5cef1))
+* add step to fix Prettier formatting in release workflow ([da36a4b](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/da36a4b670cbeb142814809c33711a02f88929b5))
+* align EXPOSE port with runtime PORT configuration ([78fc662](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/78fc66245a3c3a4289bf17bf491182d69a8b8a80))
+* improve entrypoint flexibility and deployment configuration ([194b591](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/194b5913cec4a176cd9f5872c0604ea344d2fd2f))
+* improve error handling in user and reset password token services ([6fa2e64](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/6fa2e64b1c0ed2cd6e18b15748664ad83bef2b0d))
+* map DEPLOY_ENV to correct Doppler config names (dev/prd) ([5cabe33](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/5cabe33d1a56540ff941beee1fe4d03101eca1e5))
+* remove unnecessary blank line in CHANGELOG.md ([988d746](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/988d74667057fa9f4e317a74c2a7671dd183b158))
+* remove unnecessary deletedAt checks in user queries and improve user deletion logging ([f6c6bc5](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/f6c6bc508003d97c38e66234993e63ca37ca2b50))
+* remove unnecessary options from release workflow steps ([9721597](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/97215971eec85900a170daf2480a6bcf66a11113))
+* update README to reflect service features and setup instructions ([6517173](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/6517173af9184b670f61af6179c29f265084522c))
+* update SECRET environment variable reference in EC2 deployment workflow ([98e1811](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/98e1811a6a89c1e15a60ee88f5cc46618fabae89))
+* use BuildKit secrets instead of build-args for sensitive values ([aaf312a](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/aaf312a502c2f5cbea0edffb24ffcf99bd1a567b))
+* use environment variable for service name in health check response ([bbb2f59](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/bbb2f590af9224cc3c2a4841ef7e8566a8221a08))
+* validate DEPLOY_ENV values and remove dead code in checkEmail ([b0c922c](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/b0c922cf34416cff82f3771ce69769d9f95b7cb6))
+
+
+### Features
+
+* add PR quality check workflow and commit message linting ([0912abc](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/0912abc3a59df981666887f3dbb14403e2c38e6d))
+* add reset password email template and integrate with email service ([2e8c4bf](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/2e8c4bf2c9c7541291f965dbedb80af20f1f32a7))
+* add SECRET environment variable to EC2 deployment workflow ([0b25e83](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/0b25e8311585be68886f3b1873c1dfa9e4cbfd92))
+* add step to generate Prisma Client in release workflow ([589acc8](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/589acc86d3b2df1b29d3569d9611ffa91f33a07c))
+* configure npm to ignore engine warnings during deployment ([c37cef9](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/c37cef9fc61e1d32fb1f140c915115eac4077667))
+* enhance logging and error handling across controllers and services; ([0a4a2af](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/0a4a2af70c746657635796df6f22e6a0c6491f51))
+* enhance soft delete functionality with error handling and timestamp; remove unused test module ([fce185e](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/fce185e72dd0774df04767b05dc046e85a45456a))
+* enhance user management and email handling; implement rate limiting and security improvements ([3cc3564](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/3cc35640c23cb455350289168b77018ebbd37e16))
+* implement cascading soft delete for users and related records; add rate limiter middleware ([d89b4a2](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/d89b4a2448b3a713e570b82d65d5c321a22c8acb))
+* implement soft delete for restaurant users and add deletedAt field; update user and auth logic ([20f522c](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/20f522cbef92b7a5c442ebe4fc67bb388ccf7fa1))
+* integrate Resend API for email handling and update environment configuration ([b70dc95](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/b70dc950a8ec38cb536984f4b5bae48641e88033))
+* refactor authentication and authorization middleware; implement graceful server startup ([5bc10be](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/5bc10bec2b7291d06e6e2e6b7c9e196bacfcb802))
+* security measures across services; add HTML escaping utilities ([ad86e7a](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/ad86e7a3fb232f9b3bb1b8d94aa451c02eb60441))
+* simplify EC2 deployment workflow ([3fbcdf5](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/3fbcdf5da6c1e1816d8984ac5589928d7f02380c))
+* update .env.example to clarify local development settings and remove sensitive information ([03bf786](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/03bf78645d3847869aa2d91ecd7d09696b80e494))
+* update deployment workflow to install dependencies and run Prisma migrations ([8516701](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/85167017ec0b3db4cd6266d1de64d93606236bf8))
+* update EC2 deployment configuration ([aed153a](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/aed153a5635aec1dd6c9d3373e341687f0a5a8a6))
+* update EC2 deployment workflow and database connection handling ([baa7870](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/baa7870e8c08482eae0c37a334255cb8d4f3da67))
+* update EC2 deployment workflow and Dockerfile for environment variable handling ([2d29ff1](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/2d29ff1a7119d87206b745ea7c07a618cddb8fef))
+
 # [1.0.0-beta.6](https://github.com/DiluDevX/deliveroo-auth-service/compare/v1.0.0-beta.5...v1.0.0-beta.6) (2026-02-21)
 
 ### Bug Fixes
