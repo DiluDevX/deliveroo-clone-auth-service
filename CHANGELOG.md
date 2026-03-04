@@ -1,3 +1,10 @@
+# [1.0.0-beta.8](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.7...v1.0.0-beta.8) (2026-03-04)
+
+
+### Bug Fixes
+
+* update AWS_REGION reference in EC2 deployment workflow ([5f81c67](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/5f81c673e32600306a239a9ba15da66046c548de))
+
 # [1.0.0-beta.7](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.6...v1.0.0-beta.7) (2026-03-04)
 
 ### Bug Fixes
