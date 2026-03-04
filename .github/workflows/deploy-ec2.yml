@@ -80,13 +80,13 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
-              docker login --username AWS --password-stdin $ECR_REGISTRY
+            aws ecr get-login-password --region "$AWS_REGION" | \
+              docker login --username AWS --password-stdin "$ECR_REGISTRY"
 
             # Fetch secrets and write to a temp .env file
             aws secretsmanager get-secret-value \
-              --secret-id $SECRET \
-              --region ${{ secrets.AWS_REGION }} \
+              --secret-id "$SECRET" \
+              --region "$AWS_REGION" \
               --query SecretString \
               --output text | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' > /tmp/app.env
 
