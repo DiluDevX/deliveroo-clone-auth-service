@@ -1,9 +1,6 @@
 name: Deploy To EC2
 
 on:
-  push:
-    branches:
-      - main
   release:
     types: [published]
   workflow_dispatch:
@@ -18,25 +15,18 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' || (github.event_name == 'push' && github.ref_name == 'main') || (github.event_name == 'workflow_dispatch' && github.ref_name == 'main')
     environment:
-      name: production
+      name: ${{ github.event_name == 'release' && github.event.release.target_commitish == 'main' && 'production' || github.ref_name == 'main' && 'production' || 'development' }}
     env:
       APP_VERSION: ${{ github.event_name == 'release' && github.event.release.tag_name || github.sha }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+      ENVIRONMENT: ${{ github.event_name == 'release' && github.event.release.target_commitish == 'main' && 'production' || github.ref_name == 'main' && 'production' || 'development' }}
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+      SECRET: ${{ vars.SECRET }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run Prisma migrations
-        run: npm run prisma:migrate
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
@@ -59,83 +49,67 @@ jobs:
           push: true
           build-args: |
             APP_VERSION=${{ env.APP_VERSION }}
+            ENV=${{ env.ENVIRONMENT }}
           tags: |
             ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.APP_VERSION }}
             ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest-${{ env.ENVIRONMENT }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Create ECR auth token for EC2 pull
-        id: ecr-password
-        run: |
-          echo "password=$(aws ecr get-login-password --region $AWS_REGION)" >> "$GITHUB_OUTPUT"
-
       - name: Pull and run on EC2
-        uses: appleboy/ssh-action@v1.2.5
+        uses: appleboy/ssh-action@8743aa11bfbda97acb45c151ae7a2e0b203f1914
         id: deploy
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
-          IMAGE_TAG: ${{ env.APP_VERSION }}
-          ECR_PASSWORD: ${{ steps.ecr-password.outputs.password }}
-          SERVICE_NAME: 'auth-service'
-          COMPANY_NAME: 'Deliveroo Clone'
-          COMPANY_EMAIL: 'noreply@deliveroo-clone.com'
-          LOGO_URL: 'https://via.placeholder.com/200?text=Deliveroo'
-          SUPPORT_EMAIL: 'support@deliveroo-clone.com'
-          APP_URL: 'https://deliveroo-clone-prod.dilum.me'
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          port: 22
-          envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,ECR_PASSWORD,SERVICE_NAME,COMPANY_NAME,COMPANY_EMAIL,LOGO_URL,SUPPORT_EMAIL,APP_URL
+          envs: ECR_REGISTRY,ECR_REPOSITORY,APP_VERSION,SECRET,AWS_REGION
           script: |
             set -eu
+            aws ecr get-login-password --region "$AWS_REGION" | \
+              docker login --username AWS --password-stdin "$ECR_REGISTRY"
 
-            IMAGE_URI="$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-            CONTAINER_NAME="deliveroo-auth-service"
-            OLD_CONTAINER_ID=$(docker ps -q -f name="^${CONTAINER_NAME}$" 2>/dev/null || echo "")
+            # Fetch secrets and write to a persistent .env file
+            aws secretsmanager get-secret-value \
+              --secret-id "$SECRET" \
+              --region "$AWS_REGION" \
+              --query SecretString \
+              --output text | jq -r 'to_entries | .[] | "\$(.key)=\$(.value|@json)"' > /home/ec2-user/app.env
+            chmod 600 /home/ec2-user/app.env
+            # Ensure secrets file is cleaned up after the script finishes
+            trap 'rm -f /home/ec2-user/app.env' EXIT
 
-            echo "$ECR_PASSWORD" | docker login --username AWS --password-stdin "$ECR_REGISTRY"
-            docker pull "$IMAGE_URI"
+            docker pull "$ECR_REGISTRY/$ECR_REPOSITORY:$APP_VERSION"
+
+            # Run migrations before swapping the container
+            docker run --rm \
+              --env-file /home/ec2-user/app.env \
+              "$ECR_REGISTRY/$ECR_REPOSITORY:$APP_VERSION" \
+              npx prisma migrate deploy
 
             # Stop old container BEFORE starting new one to free port 80 (keep container for rollback)
+            OLD_CONTAINER_ID=$(docker ps -q -f name="^app$" 2>/dev/null || echo "")
             if [ -n "$OLD_CONTAINER_ID" ]; then
               echo "Stopping old container: $OLD_CONTAINER_ID"
               docker stop "$OLD_CONTAINER_ID" >/dev/null 2>&1 || true
             fi
 
-            # Load secrets from AWS Parameter Store
-            source /home/ec2-user/fetch-secrets.sh
-
             # Start new container with error handling
             set +e
             NEW_CONTAINER_ID=$(docker run -d \
-              --name "${CONTAINER_NAME}-new" \
+              --name "app-new" \
               --restart unless-stopped \
               -p 80:3000 \
-              -e NODE_ENV="production" \
-              -e PORT="3000" \
-              -e APP_VERSION="$IMAGE_TAG" \
-              -e DATABASE_URL="$DATABASE_URL" \
-              -e JWT_SECRET="$JWT_SECRET" \
-              -e DELIVEROO_CLONE_API_KEY="$DELIVEROO_CLONE_API_KEY" \
-              -e SERVICE_NAME="$SERVICE_NAME" \
-              -e COMPANY_NAME="$COMPANY_NAME" \
-              -e COMPANY_EMAIL="$COMPANY_EMAIL" \
-              -e LOGO_URL="$LOGO_URL" \
-              -e SUPPORT_EMAIL="$SUPPORT_EMAIL" \
-              -e APP_URL="$APP_URL" \
-              -e RESEND_API_KEY="$RESEND_API_KEY" \
-              "$IMAGE_URI" 2>&1)
+              --env-file /home/ec2-user/app.env \
+              "$ECR_REGISTRY/$ECR_REPOSITORY:$APP_VERSION" 2>&1)
             DOCKER_RUN_STATUS=$?
             set -e
 
             if [ $DOCKER_RUN_STATUS -ne 0 ]; then
               echo "✗ Failed to start new container: $NEW_CONTAINER_ID"
               # Cleanup any partial container
-              docker rm -f "${CONTAINER_NAME}-new" 2>/dev/null || true
+              docker rm -f "app-new" 2>/dev/null || true
               # Restart old container if it exists
               if [ -n "$OLD_CONTAINER_ID" ]; then
                 echo "Restarting old container: $OLD_CONTAINER_ID"
@@ -157,9 +131,9 @@ jobs:
                 echo "✓ Health check passed!"
 
                 # Remove old container with production name if it exists
-                docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
+                docker rm -f "app" 2>/dev/null || true
                 # Rename new container to production name
-                docker rename "${CONTAINER_NAME}-new" "$CONTAINER_NAME"
+                docker rename "app-new" "app"
                 echo "✓ Deployment successful!"
                 exit 0
               fi
@@ -178,6 +152,12 @@ jobs:
               docker start "$OLD_CONTAINER_ID" || true
             fi
             exit 1
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+          APP_VERSION: ${{ env.APP_VERSION }}
+          SECRET: ${{ env.SECRET }}
+          AWS_REGION: ${{ env.AWS_REGION }}
 
       - name: Notify deployment failure
         if: failure() && steps.deploy.outcome == 'failure'
