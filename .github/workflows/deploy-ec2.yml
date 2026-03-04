@@ -1,10 +1,6 @@
 name: Deploy To EC2
 
 on:
-  push:
-    branches:
-      - develop
-      - main
   release:
     types: [published]
   workflow_dispatch:
@@ -24,8 +20,8 @@ jobs:
     env:
       APP_VERSION: ${{ github.event_name == 'release' && github.event.release.tag_name || github.sha }}
       ENVIRONMENT: ${{ github.ref_name == 'main' && 'production' || 'development' }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
 
     steps:
       - name: Checkout
@@ -62,151 +58,36 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Set environment variables
-        id: set-env
-        run: |
-          if [ "${{ github.ref_name }}" = "main" ]; then
-            echo "NODE_ENV=production" >> $GITHUB_ENV
-            echo "DATABASE_URL=${{ secrets.PROD_DATABASE_URL }}" >> $GITHUB_ENV
-            echo "JWT_SECRET=${{ secrets.PROD_JWT_SECRET }}" >> $GITHUB_ENV
-            echo "DELIVEROO_CLONE_API_KEY=${{ secrets.PROD_DELIVEROO_CLONE_API_KEY }}" >> $GITHUB_ENV
-            echo "RESEND_API_KEY=${{ secrets.PROD_RESEND_API_KEY }}" >> $GITHUB_ENV
-            echo "SERVICE_NAME=auth-service-production" >> $GITHUB_ENV
-            echo "COMPANY_NAME=Deliveroo Clone" >> $GITHUB_ENV
-            echo "COMPANY_EMAIL=noreply@deliveroo-clone.com" >> $GITHUB_ENV
-            echo "LOGO_URL=https://via.placeholder.com/200?text=Deliveroo" >> $GITHUB_ENV
-            echo "SUPPORT_EMAIL=support@deliveroo-clone.com" >> $GITHUB_ENV
-            echo "APP_URL=https://deliveroo-clone-prod.dilum.me" >> $GITHUB_ENV
-          else
-            echo "NODE_ENV=development" >> $GITHUB_ENV
-            echo "DATABASE_URL=${{ secrets.DEV_DATABASE_URL }}" >> $GITHUB_ENV
-            echo "JWT_SECRET=${{ secrets.DEV_JWT_SECRET }}" >> $GITHUB_ENV
-            echo "DELIVEROO_CLONE_API_KEY=${{ secrets.DEV_DELIVEROO_CLONE_API_KEY }}" >> $GITHUB_ENV
-            echo "RESEND_API_KEY=${{ secrets.DEV_RESEND_API_KEY }}" >> $GITHUB_ENV
-            echo "SERVICE_NAME=auth-service-development" >> $GITHUB_ENV
-            echo "COMPANY_NAME=Deliveroo Clone (Dev)" >> $GITHUB_ENV
-            echo "COMPANY_EMAIL=dev@deliveroo-clone.com" >> $GITHUB_ENV
-            echo "LOGO_URL=https://via.placeholder.com/200?text=Deliveroo+Dev" >> $GITHUB_ENV
-            echo "SUPPORT_EMAIL=dev-support@deliveroo-clone.com" >> $GITHUB_ENV
-            echo "APP_URL=https://deliveroo-clone-dev.dilum.me" >> $GITHUB_ENV
-          fi
-
       - name: Pull and run on EC2
         uses: appleboy/ssh-action@v1.2.5
         id: deploy
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
-          IMAGE_TAG: ${{ env.APP_VERSION }}
-          NODE_ENV: ${{ env.NODE_ENV }}
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          JWT_SECRET: ${{ env.JWT_SECRET }}
-          DELIVEROO_CLONE_API_KEY: ${{ env.DELIVEROO_CLONE_API_KEY }}
-          RESEND_API_KEY: ${{ env.RESEND_API_KEY }}
-          SERVICE_NAME: ${{ env.SERVICE_NAME }}
-          COMPANY_NAME: ${{ env.COMPANY_NAME }}
-          COMPANY_EMAIL: ${{ env.COMPANY_EMAIL }}
-          LOGO_URL: ${{ env.LOGO_URL }}
-          SUPPORT_EMAIL: ${{ env.SUPPORT_EMAIL }}
-          APP_URL: ${{ env.APP_URL }}
+          APP_VERSION: ${{ env.APP_VERSION }}
+          SECRET: ${{ env.SECRET }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          port: 22
-          envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,NODE_ENV,DATABASE_URL,JWT_SECRET,DELIVEROO_CLONE_API_KEY,RESEND_API_KEY,SERVICE_NAME,COMPANY_NAME,COMPANY_EMAIL,LOGO_URL,SUPPORT_EMAIL,APP_URL
           script: |
-            set -eu
+            aws ecr get-login-password --region $AWS_REGION | \
+              docker login --username AWS --password-stdin $ECR_REGISTRY
 
-            IMAGE_URI="$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-            CONTAINER_NAME="deliveroo-auth-service"
-            OLD_CONTAINER_ID=$(docker ps -q -f name="^${CONTAINER_NAME}$" 2>/dev/null || echo "")
+             # Fetch secrets and write to a temp .env file
+            aws secretsmanager get-secret-value \
+              --secret-id $SECRET \
+              --query SecretString \
+              --output text | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' > /tmp/app.env
 
-            # Login to ECR using IAM role (no need for explicit auth token)
-            aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin "$ECR_REGISTRY"
-            docker pull "$IMAGE_URI"
+            docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$APP_VERSION
+            docker stop app || true
+            docker rm app || true
 
-            # Stop old container BEFORE starting new one to free port 80 (keep container for rollback)
-            if [ -n "$OLD_CONTAINER_ID" ]; then
-              echo "Stopping old container: $OLD_CONTAINER_ID"
-              docker stop "$OLD_CONTAINER_ID" >/dev/null 2>&1 || true
-            fi
-
-            # Load secrets from AWS Parameter Store
-            source /home/ec2-user/fetch-secrets.sh
-
-            # Start new container with error handling
-            set +e
-            NEW_CONTAINER_ID=$(docker run -d \
-              --name "${CONTAINER_NAME}-new" \
-              --restart unless-stopped \
+            docker run -d --name app --restart unless-stopped \
               -p 80:3000 \
-              -e NODE_ENV="$NODE_ENV" \
-              -e PORT="3000" \
-              -e APP_VERSION="$IMAGE_TAG" \
-              -e DATABASE_URL="$DATABASE_URL" \
-              -e JWT_SECRET="$JWT_SECRET" \
-              -e DELIVEROO_CLONE_API_KEY="$DELIVEROO_CLONE_API_KEY" \
-              -e SERVICE_NAME="$SERVICE_NAME" \
-              -e COMPANY_NAME="$COMPANY_NAME" \
-              -e COMPANY_EMAIL="$COMPANY_EMAIL" \
-              -e LOGO_URL="$LOGO_URL" \
-              -e SUPPORT_EMAIL="$SUPPORT_EMAIL" \
-              -e APP_URL="$APP_URL" \
-              -e RESEND_API_KEY="$RESEND_API_KEY" \
-              "$IMAGE_URI" 2>&1)
-            DOCKER_RUN_STATUS=$?
-            set -e
+              --env-file /tmp/app.env \
+              $ECR_REGISTRY/$ECR_REPOSITORY:$APP_VERSION
 
-            if [ $DOCKER_RUN_STATUS -ne 0 ]; then
-              echo "✗ Failed to start new container: $NEW_CONTAINER_ID"
-              # Cleanup any partial container
-              docker rm -f "${CONTAINER_NAME}-new" 2>/dev/null || true
-              # Restart old container if it exists
-              if [ -n "$OLD_CONTAINER_ID" ]; then
-                echo "Restarting old container: $OLD_CONTAINER_ID"
-                docker start "$OLD_CONTAINER_ID" || true
-              fi
-              exit 1
-            fi
-
-            echo "New container ID: $NEW_CONTAINER_ID"
-
-            # Health check: wait for container to be healthy (max 30 seconds)
-            HEALTH_CHECK_INTERVAL=2
-            HEALTH_CHECK_TIMEOUT=30
-            ELAPSED=0
-
-            while [ $ELAPSED -lt $HEALTH_CHECK_TIMEOUT ]; do
-              # Health check from host (container exposes port 80)
-              if curl -sf http://localhost:80/ >/dev/null 2>&1; then
-                echo "✓ Health check passed!"
-
-                # Remove old container with production name if it exists
-                docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
-                # Rename new container to production name
-                docker rename "${CONTAINER_NAME}-new" "$CONTAINER_NAME"
-                echo "✓ Deployment successful!"
-                exit 0
-              fi
-
-              echo "Health check failed, retrying in ${HEALTH_CHECK_INTERVAL}s... ($ELAPSED/${HEALTH_CHECK_TIMEOUT}s)"
-              sleep $HEALTH_CHECK_INTERVAL
-              ELAPSED=$((ELAPSED + HEALTH_CHECK_INTERVAL))
-            done
-
-            # Health check timeout - rollback to old container
-            echo "✗ Health check failed after ${HEALTH_CHECK_TIMEOUT}s. Rolling back..."
-            docker rm -f "$NEW_CONTAINER_ID" || true
-
-            if [ -n "$OLD_CONTAINER_ID" ]; then
-              echo "Restarting old container: $OLD_CONTAINER_ID"
-              docker start "$OLD_CONTAINER_ID" || true
-            fi
-            exit 1
-
-      - name: Notify deployment failure
-        if: failure() && steps.deploy.outcome == 'failure'
-        run: |
-          echo "❌ Deployment failed and rolled back to previous version"
-          exit 1
+            # Clean up
+            rm -f /tmp/app.env
