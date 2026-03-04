@@ -1,9 +1,8 @@
 # [1.0.0-beta.9](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.8...v1.0.0-beta.9) (2026-03-04)
 
-
 ### Bug Fixes
 
-* update AWS_REGION references to use variable syntax in EC2 deployment script ([963cd33](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/963cd33e7bdba803248e5d0cc8fd4f8c28dccc60))
+- update AWS_REGION references to use variable syntax in EC2 deployment script ([963cd33](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/963cd33e7bdba803248e5d0cc8fd4f8c28dccc60))
 
 # [1.0.0-beta.8](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.7...v1.0.0-beta.8) (2026-03-04)
 

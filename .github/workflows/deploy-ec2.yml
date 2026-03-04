@@ -75,11 +75,18 @@ jobs:
           ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
           APP_VERSION: ${{ env.APP_VERSION }}
           SECRET: ${{ env.SECRET }}
+          AWS_REGION: ${{ env.AWS_REGION }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            echo "Debug: AWS_REGION=$AWS_REGION"
+            echo "Debug: ECR_REGISTRY=$ECR_REGISTRY"
+            echo "Debug: ECR_REPOSITORY=$ECR_REPOSITORY"
+            echo "Debug: APP_VERSION=$APP_VERSION"
+            echo "Debug: SECRET=$SECRET"
+
             aws ecr get-login-password --region "$AWS_REGION" | \
               docker login --username AWS --password-stdin "$ECR_REGISTRY"
 
@@ -90,14 +97,14 @@ jobs:
               --query SecretString \
               --output text | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' > /tmp/app.env
 
-            docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$APP_VERSION
+            docker pull "$ECR_REGISTRY/$ECR_REPOSITORY:$APP_VERSION"
             docker stop app || true
             docker rm app || true
 
             docker run -d --name app --restart unless-stopped \
               -p 80:3000 \
               --env-file /tmp/app.env \
-              $ECR_REGISTRY/$ECR_REPOSITORY:$APP_VERSION
+              "$ECR_REGISTRY/$ECR_REPOSITORY:$APP_VERSION"
 
             # Clean up
             rm -f /tmp/app.env
