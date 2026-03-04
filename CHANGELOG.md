@@ -1,3 +1,10 @@
+# [1.0.0-beta.12](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.11...v1.0.0-beta.12) (2026-03-04)
+
+
+### Bug Fixes
+
+* update EC2 deployment script to use persistent .env file and run migrations ([8f7f8b1](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/8f7f8b1d41a144f652d07cc2e65af2acd0f3acdc))
+
 # [1.0.0-beta.11](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.10...v1.0.0-beta.11) (2026-03-04)
 
 ### Bug Fixes
