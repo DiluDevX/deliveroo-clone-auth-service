@@ -22,7 +22,7 @@ jobs:
       ENVIRONMENT: ${{ github.ref_name == 'main' && 'production' || 'development' }}
       AWS_REGION: ${{ vars.AWS_REGION }}
       ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
-      SECRET: ${{ secrets.SECRET }}
+      SECRET: ${{ vars.SECRET }}
 
     steps:
       - name: Checkout
