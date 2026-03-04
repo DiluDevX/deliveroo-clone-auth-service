@@ -70,16 +70,11 @@ jobs:
       - name: Pull and run on EC2
         uses: appleboy/ssh-action@v1.2.5
         id: deploy
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
-          APP_VERSION: ${{ env.APP_VERSION }}
-          SECRET: ${{ env.SECRET }}
-          AWS_REGION: ${{ env.AWS_REGION }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          envs: ECR_REGISTRY,ECR_REPOSITORY,APP_VERSION,SECRET,AWS_REGION
           script: |
             echo "Debug: AWS_REGION=$AWS_REGION"
             echo "Debug: ECR_REGISTRY=$ECR_REGISTRY"
@@ -108,3 +103,9 @@ jobs:
 
             # Clean up
             rm -f /tmp/app.env
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+          APP_VERSION: ${{ env.APP_VERSION }}
+          SECRET: ${{ env.SECRET }}
+          AWS_REGION: ${{ env.AWS_REGION }}
