@@ -1,9 +1,15 @@
-# [1.0.0-beta.13](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.12...v1.0.0-beta.13) (2026-03-04)
+# [1.0.0-beta.14](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.13...v1.0.0-beta.14) (2026-03-04)
 
 
 ### Bug Fixes
 
-* enhance EC2 deployment script with rollback and health check mechanisms ([f1f5e65](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/f1f5e65e2c1cf8a69d82a065532a1590a9356b5c))
+* align deploy-ec2.yml with main branch fixes ([5745b6f](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/5745b6f7d38e480e2373068e6b1284617999ecc0))
+
+# [1.0.0-beta.13](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.12...v1.0.0-beta.13) (2026-03-04)
+
+### Bug Fixes
+
+- enhance EC2 deployment script with rollback and health check mechanisms ([f1f5e65](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/f1f5e65e2c1cf8a69d82a065532a1590a9356b5c))
 
 # [1.0.0-beta.12](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.11...v1.0.0-beta.12) (2026-03-04)
 
