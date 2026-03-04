@@ -31,7 +31,7 @@ ARG ENV=production
 ARG APP_VERSION=unknown
 ENV ENV=$ENV \
     APP_VERSION=$APP_VERSION \
-    NODE_ENV=production
+    NODE_ENV=$ENV
 
 COPY --from=deps    --chown=app:nodejs /app/node_modules    ./node_modules
 COPY --from=builder --chown=app:nodejs /app/prisma          ./prisma
