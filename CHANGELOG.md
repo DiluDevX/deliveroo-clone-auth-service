@@ -1,9 +1,8 @@
 # [1.0.0-beta.11](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.10...v1.0.0-beta.11) (2026-03-04)
 
-
 ### Bug Fixes
 
-* refactor environment variable handling in EC2 deployment script and add debug outputs ([fa8a634](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/fa8a6345bd0d96654acb08c0d2aeece8c368504e))
+- refactor environment variable handling in EC2 deployment script and add debug outputs ([fa8a634](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/fa8a6345bd0d96654acb08c0d2aeece8c368504e))
 
 # [1.0.0-beta.10](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.9...v1.0.0-beta.10) (2026-03-04)
 

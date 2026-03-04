@@ -76,33 +76,32 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           envs: ECR_REGISTRY,ECR_REPOSITORY,APP_VERSION,SECRET,AWS_REGION
           script: |
-            echo "Debug: AWS_REGION=$AWS_REGION"
-            echo "Debug: ECR_REGISTRY=$ECR_REGISTRY"
-            echo "Debug: ECR_REPOSITORY=$ECR_REPOSITORY"
-            echo "Debug: APP_VERSION=$APP_VERSION"
-            echo "Debug: SECRET=$SECRET"
-
             aws ecr get-login-password --region "$AWS_REGION" | \
               docker login --username AWS --password-stdin "$ECR_REGISTRY"
 
-            # Fetch secrets and write to a temp .env file
+            # Fetch secrets and write to a persistent .env file
             aws secretsmanager get-secret-value \
               --secret-id "$SECRET" \
               --region "$AWS_REGION" \
               --query SecretString \
-              --output text | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' > /tmp/app.env
+              --output text | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' > /home/ec2-user/app.env
+            chmod 600 /home/ec2-user/app.env
 
             docker pull "$ECR_REGISTRY/$ECR_REPOSITORY:$APP_VERSION"
+
+            # Run migrations before swapping the container
+            docker run --rm \
+              --env-file /home/ec2-user/app.env \
+              "$ECR_REGISTRY/$ECR_REPOSITORY:$APP_VERSION" \
+              npx prisma migrate deploy
+
             docker stop app || true
             docker rm app || true
 
             docker run -d --name app --restart unless-stopped \
               -p 80:3000 \
-              --env-file /tmp/app.env \
+              --env-file /home/ec2-user/app.env \
               "$ECR_REGISTRY/$ECR_REPOSITORY:$APP_VERSION"
-
-            # Clean up
-            rm -f /tmp/app.env
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
