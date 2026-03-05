@@ -1,3 +1,10 @@
+# [1.0.0-beta.31](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.30...v1.0.0-beta.31) (2026-03-05)
+
+
+### Bug Fixes
+
+* remove unnecessary newline in entrypoint script ([1dc0264](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/1dc0264ccfb9dcf6722aa004a2c125641df020af))
+
 # [1.0.0-beta.30](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.29...v1.0.0-beta.30) (2026-03-05)
 
 
