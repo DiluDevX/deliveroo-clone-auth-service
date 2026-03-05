@@ -1,3 +1,10 @@
+# [1.0.0-beta.22](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.21...v1.0.0-beta.22) (2026-03-05)
+
+
+### Bug Fixes
+
+* update tag pattern for deployment trigger in EC2 workflow ([35dbfc7](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/35dbfc71720f6b4733fb664b5fe7bee07fa36abd))
+
 # [1.0.0-beta.21](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.20...v1.0.0-beta.21) (2026-03-05)
 
 
