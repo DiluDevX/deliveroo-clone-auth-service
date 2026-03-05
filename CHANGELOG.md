@@ -1,3 +1,10 @@
+# [1.0.0-beta.35](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.34...v1.0.0-beta.35) (2026-03-05)
+
+
+### Features
+
+* add workflow_dispatch trigger to development and production release workflows ([3ed02a0](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/3ed02a010ec427fdf2d20c31710cb502fd28762f))
+
 # [1.0.0-beta.34](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.33...v1.0.0-beta.34) (2026-03-05)
 
 
