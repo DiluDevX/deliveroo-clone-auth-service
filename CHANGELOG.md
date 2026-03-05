@@ -1,3 +1,10 @@
+# [1.0.0-beta.19](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.18...v1.0.0-beta.19) (2026-03-05)
+
+
+### Bug Fixes
+
+* update release workflow to use environment variable for GITHUB_TOKEN ([766837d](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/766837dcc6a6682ce7b758f3c8724a4a94c78d5f))
+
 # [1.0.0-beta.18](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.17...v1.0.0-beta.18) (2026-03-05)
 
 
