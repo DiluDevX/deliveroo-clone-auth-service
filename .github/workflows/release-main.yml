@@ -1,4 +1,4 @@
-name: Release Main
+name: CI/CD — Production Release
 
 on:
   push:
@@ -11,7 +11,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  release:
+  release-production:
+    name: Release to Production
     uses: ./.github/workflows/deploy.yml
     with:
       environment: production

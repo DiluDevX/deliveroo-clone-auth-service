@@ -1,4 +1,4 @@
-name: Quality Check
+name: PR — Quality Checks
 
 on:
   pull_request:
@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   quality-checks:
-    name: ${{ matrix.check.name }}
+    name: Quality / ${{ matrix.check.name }}
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     timeout-minutes: 15

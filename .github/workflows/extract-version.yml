@@ -1,4 +1,4 @@
-name: Extract Version
+name: Utility — Extract Release Version
 
 on:
   workflow_call:
@@ -12,6 +12,7 @@ on:
 
 jobs:
   extract:
+    name: Extract Latest Git Tag Version
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.extract.outputs.version }}

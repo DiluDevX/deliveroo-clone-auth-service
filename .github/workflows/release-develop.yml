@@ -1,4 +1,4 @@
-name: Release Develop
+name: CI/CD — Development Release
 
 on:
   push:
@@ -11,7 +11,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  release:
+  release-development:
+    name: Release to Development
     uses: ./.github/workflows/deploy.yml
     with:
       environment: development
