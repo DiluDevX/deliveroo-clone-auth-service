@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import { EnvironmentEnum } from '../utils/constants';
+import { logger } from '../utils/logger';
 dotenv.config();
 
 interface MailConfig {
@@ -83,3 +84,20 @@ export const environment: Environment = {
   },
   serviceName: requireEnv('SERVICE_NAME'),
 };
+
+// Log all environment variables on startup
+logger.info({
+  msg: 'Environment variables loaded',
+  port: environment.port,
+  env: environment.env,
+  version: environment.version,
+  baseUrl: environment.baseUrl,
+  databaseUrl: environment.databaseUrl.substring(0, 50) + '...', // Masked for security
+  jwtExpiresInMinutes: environment.jwt.expiresInMinutes,
+  jwtRefreshExpiresInDays: environment.jwt.refreshExpiresInDays,
+  jwtResetPasswordExpiresInHours: environment.jwt.resetPasswordExpiresInHours,
+  logLevel: environment.logging.level,
+  serviceName: environment.serviceName,
+  companyName: environment.mail.companyName,
+  appUrl: environment.mail.appUrl,
+});
