@@ -1,3 +1,27 @@
+# [1.1.0-beta.1](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0...v1.1.0-beta.1) (2026-03-05)
+
+
+### Bug Fixes
+
+* add logging for DATABASE_URL in entrypoint script for debugging ([496a0ec](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/496a0ec0e4eccd5903651da55452258517ff2785))
+* remove database URL logging and Prisma migration commands from entrypoint script ([ae5bdda](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/ae5bdda2ff4c09327b5c68cc0e3df7983ea306ed))
+* remove rate limit configuration from environment and centralize in middleware ([4264f29](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/4264f294b13a31e45ab5cdb08780958376572ab8))
+* remove unnecessary newline in entrypoint script ([1dc0264](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/1dc0264ccfb9dcf6722aa004a2c125641df020af))
+* standardize job names in workflow files for clarity ([ec7bdc8](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/ec7bdc89759e574d47ef4581d606dc2b2c926f2c))
+* update EC2 deployment workflow to use workflow_run and improve version resolution ([7883356](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/78833569fb93c2c5344a033a5434c383d6ff9505))
+* update ECR repository name description in README ([b021027](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/b021027596d4c9a615a2b6ce1963480b0ce4f61c))
+* update secret output formatting in deploy workflow ([9c8ee24](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/9c8ee24318b3ece6fc9e2b97f3cdd54fad4d764e))
+* update tag pattern for deployment trigger in EC2 workflow ([35dbfc7](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/35dbfc71720f6b4733fb664b5fe7bee07fa36abd))
+
+
+### Features
+
+* add workflow_dispatch trigger to development and production release workflows ([3ed02a0](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/3ed02a010ec427fdf2d20c31710cb502fd28762f))
+* enhance deployment workflows with improved job naming and container management ([8008e85](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/8008e8514a87153b195f0441b12496b4b9096037))
+* enhance logging of environment variables with masking for sensitive data ([63f607b](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/63f607b93923246d19d146ca3edfbb6505fb2985))
+* enhance workflow files with improved naming and structure for clarity ([c6214e4](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/c6214e4247885bbeff69f612b07f5f72cf8c56f2))
+* restructure CI/CD workflows for deployment and version extraction ([8bc45e4](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/8bc45e4b34ea25541f55bff7ce73ccb866908df9))
+
 # 1.0.0 (2026-03-05)
 
 
