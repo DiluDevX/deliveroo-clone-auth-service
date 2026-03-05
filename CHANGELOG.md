@@ -1,3 +1,13 @@
+# [1.0.0-beta.18](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.17...v1.0.0-beta.18) (2026-03-05)
+
+
+### Bug Fixes
+
+* correct environment detection and env file escaping ([0c30e5c](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/0c30e5ccf391f11e863e93a822dc062a7486746a))
+* enhance environment detection and update Node.js setup action ([f2c890a](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/f2c890a5a640a976cb09e09e8f39b90fb2a953c2))
+* ensure credentials are not persisted during checkout in release workflow ([13f23e0](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/13f23e009b3d02529caf87a762ccd03cd2ddd584))
+* update cSpell configuration to include 'appleboy' in recognized words ([fe72fe1](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/fe72fe1e6ea63158adfd3901fd6224174ab33390))
+
 # [1.0.0-beta.17](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.16...v1.0.0-beta.17) (2026-03-05)
 
 ### Bug Fixes
