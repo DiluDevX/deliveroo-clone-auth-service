@@ -1,9 +1,8 @@
 # [1.0.0-beta.17](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.16...v1.0.0-beta.17) (2026-03-05)
 
-
 ### Bug Fixes
 
-* update EC2 deployment workflow to use push events and improve environment handling ([903518e](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/903518ea992fede71a8a65e27168bca421fd3236))
+- update EC2 deployment workflow to use push events and improve environment handling ([903518e](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/903518ea992fede71a8a65e27168bca421fd3236))
 
 # [1.0.0-beta.16](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.15...v1.0.0-beta.16) (2026-03-05)
 
