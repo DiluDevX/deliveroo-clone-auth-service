@@ -1,3 +1,10 @@
+# [1.0.0-beta.26](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.25...v1.0.0-beta.26) (2026-03-05)
+
+
+### Bug Fixes
+
+* standardize job names in workflow files for clarity ([ec7bdc8](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/ec7bdc89759e574d47ef4581d606dc2b2c926f2c))
+
 # [1.0.0-beta.25](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.24...v1.0.0-beta.25) (2026-03-05)
 
 
