@@ -1,6 +1,5 @@
 import dotenv from 'dotenv';
 import { EnvironmentEnum } from '../utils/constants';
-import { logger } from '../utils/logger';
 dotenv.config();
 
 interface MailConfig {
