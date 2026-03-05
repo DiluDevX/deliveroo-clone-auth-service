@@ -1,3 +1,10 @@
+# [1.0.0-beta.27](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.26...v1.0.0-beta.27) (2026-03-05)
+
+
+### Features
+
+* enhance workflow files with improved naming and structure for clarity ([c6214e4](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/c6214e4247885bbeff69f612b07f5f72cf8c56f2))
+
 # [1.0.0-beta.26](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.25...v1.0.0-beta.26) (2026-03-05)
 
 
