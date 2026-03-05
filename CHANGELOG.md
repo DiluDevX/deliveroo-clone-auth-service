@@ -1,3 +1,10 @@
+# [1.0.0-beta.29](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.28...v1.0.0-beta.29) (2026-03-05)
+
+
+### Bug Fixes
+
+* update ECR repository name description in README ([b021027](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/b021027596d4c9a615a2b6ce1963480b0ce4f61c))
+
 # [1.0.0-beta.28](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.27...v1.0.0-beta.28) (2026-03-05)
 
 
