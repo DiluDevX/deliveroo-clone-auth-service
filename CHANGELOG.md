@@ -1,3 +1,10 @@
+# [1.0.0-beta.32](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.31...v1.0.0-beta.32) (2026-03-05)
+
+
+### Bug Fixes
+
+* remove rate limit configuration from environment and centralize in middleware ([4264f29](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/4264f294b13a31e45ab5cdb08780958376572ab8))
+
 # [1.0.0-beta.31](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.30...v1.0.0-beta.31) (2026-03-05)
 
 
