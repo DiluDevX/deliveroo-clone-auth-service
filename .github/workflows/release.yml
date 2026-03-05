@@ -13,12 +13,17 @@ permissions:
 
 jobs:
   release:
-    name: Semantic Release
     runs-on: ubuntu-latest
+
+    env:
+      RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -34,11 +39,8 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Fix Prettier formatting
-        run: npm run format:fix
-
       - name: Semantic Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ env.RELEASE_TOKEN }}
           HUSKY: 0
         run: npx semantic-release
