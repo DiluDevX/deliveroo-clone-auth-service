@@ -1,8 +1,9 @@
 name: Deploy To EC2
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 permissions:
@@ -15,11 +16,14 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
+    # beta tags => development, stable tags => production
     environment:
-      name: ${{ github.event_name == 'release' && github.event.release.target_commitish == 'main' && 'production' || github.ref_name == 'main' && 'production' || 'development' }}
+      name: ${{ contains(github.ref_name, '-beta.') && 'development' || 'production' }}
+
     env:
-      APP_VERSION: ${{ github.event_name == 'release' && github.event.release.tag_name || github.sha }}
-      ENVIRONMENT: ${{ github.event_name == 'release' && github.event.release.target_commitish == 'main' && 'production' || github.ref_name == 'main' && 'production' || 'development' }}
+      APP_VERSION: ${{ github.ref_name }}
+      ENVIRONMENT: ${{ contains(github.ref_name, '-beta.') && 'development' || 'production' }}
       AWS_REGION: ${{ vars.AWS_REGION }}
       ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
       SECRET: ${{ vars.SECRET }}
@@ -32,9 +36,6 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 24
-
-      - name: Configure npm to ignore engine warnings
-        run: echo "engine-strict=false" > .npmrc
 
       - name: Install dependencies
         run: npm ci
@@ -64,9 +65,9 @@ jobs:
           tags: |
             ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.APP_VERSION }}
             ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest-${{ env.ENVIRONMENT }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          # TODO check what is cache-from and cache-to is
 
       - name: Pull and run on EC2
         uses: appleboy/ssh-action@8743aa11bfbda97acb45c151ae7a2e0b203f1914
@@ -93,82 +94,7 @@ jobs:
 
             docker pull "$ECR_REGISTRY/$ECR_REPOSITORY:$APP_VERSION"
 
-            # Run migrations before swapping the container
-            docker run --rm \
-              --env-file /home/ec2-user/app.env \
-              "$ECR_REGISTRY/$ECR_REPOSITORY:$APP_VERSION" \
-              npx prisma migrate deploy
-
-            # Stop old container BEFORE starting new one to free port 80 (keep container for rollback)
-            OLD_CONTAINER_ID=$(docker ps -q -f name="^app$" 2>/dev/null || echo "")
-            if [ -n "$OLD_CONTAINER_ID" ]; then
-              echo "Stopping old container: $OLD_CONTAINER_ID"
-              docker stop "$OLD_CONTAINER_ID" >/dev/null 2>&1 || true
-            fi
-
-            # Start new container with error handling
-            set +e
-            NEW_CONTAINER_ID=$(docker run -d \
-              --name "app-new" \
-              --restart unless-stopped \
-              -p 80:3000 \
-              --env-file /home/ec2-user/app.env \
-              "$ECR_REGISTRY/$ECR_REPOSITORY:$APP_VERSION" 2>&1)
-            DOCKER_RUN_STATUS=$?
-            set -e
-
-            if [ $DOCKER_RUN_STATUS -ne 0 ]; then
-              echo "✗ Failed to start new container: $NEW_CONTAINER_ID"
-              # Cleanup any partial container
-              docker rm -f "app-new" 2>/dev/null || true
-              # Restart old container if it exists
-              if [ -n "$OLD_CONTAINER_ID" ]; then
-                echo "Restarting old container: $OLD_CONTAINER_ID"
-                docker start "$OLD_CONTAINER_ID" || true
-              fi
-              exit 1
-            fi
-
-            echo "New container ID: $NEW_CONTAINER_ID"
-
-            # Health check: wait for container to be healthy (max 30 seconds)
-            HEALTH_CHECK_INTERVAL=2
-            HEALTH_CHECK_TIMEOUT=30
-            ELAPSED=0
-
-            while [ $ELAPSED -lt $HEALTH_CHECK_TIMEOUT ]; do
-              # Health check from host (container exposes port 80)
-              if curl -sf http://localhost:80/ >/dev/null 2>&1; then
-                echo "✓ Health check passed!"
-
-                # Remove old container with production name if it exists
-                docker rm -f "app" 2>/dev/null || true
-                # Rename new container to production name
-                docker rename "app-new" "app"
-                echo "✓ Deployment successful!"
-                exit 0
-              fi
-
-              echo "Health check failed, retrying in ${HEALTH_CHECK_INTERVAL}s... ($ELAPSED/${HEALTH_CHECK_TIMEOUT}s)"
-              sleep $HEALTH_CHECK_INTERVAL
-              ELAPSED=$((ELAPSED + HEALTH_CHECK_INTERVAL))
-            done
-
-            # Health check timeout - rollback to old container
-            echo "✗ Health check failed after ${HEALTH_CHECK_TIMEOUT}s. Rolling back..."
-            docker rm -f "$NEW_CONTAINER_ID" || true
-
-            if [ -n "$OLD_CONTAINER_ID" ]; then
-              echo "Restarting old container: $OLD_CONTAINER_ID"
-              docker start "$OLD_CONTAINER_ID" || true
-            fi
             exit 1
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
-          APP_VERSION: ${{ env.APP_VERSION }}
-          SECRET: ${{ env.SECRET }}
-          AWS_REGION: ${{ env.AWS_REGION }}
 
       - name: Notify deployment failure
         if: failure() && steps.deploy.outcome == 'failure'

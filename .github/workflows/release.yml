@@ -44,16 +44,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HUSKY: 0
         run: npx semantic-release
-
-      - name: Create PR with release artifacts (main only)
-        if: github.ref == 'refs/heads/main'
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: release-artifacts/${{ github.run_id }}
-          base: main
-          title: 'chore(release): update release artifacts'
-          commit-message: 'chore(release): update release artifacts'
-          body: |
-            Automated PR to update generated release artifacts (CHANGELOG/package-lock/package.json).
-          labels: release
