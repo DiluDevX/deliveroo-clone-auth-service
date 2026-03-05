@@ -1,3 +1,11 @@
+## [1.0.1](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0...v1.0.1) (2026-03-05)
+
+
+### Bug Fixes
+
+* add missing Node.js setup steps to deploy workflow ([7ad0006](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/7ad000694f6642eaea788559c79de95130cc388c))
+* disable git push in semantic-release to bypass branch protection ([d8ad3a0](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/d8ad3a07bf748eab3b355ab7fa6726ea0f14ecd1))
+
 # 1.0.0 (2026-03-05)
 
 
