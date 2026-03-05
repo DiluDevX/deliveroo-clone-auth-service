@@ -8,6 +8,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "build:check": "tsc --noEmit",
     "dev": "nodemon src/index.ts",
     "release": "semantic-release",
     "release:dry-run": "semantic-release --dry-run",

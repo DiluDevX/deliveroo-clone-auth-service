@@ -13,7 +13,6 @@ permissions:
 
 jobs:
   release:
-    name: Semantic Release
     runs-on: ubuntu-latest
 
     env:
@@ -39,9 +38,6 @@ jobs:
 
       - name: Build
         run: npm run build
-
-      - name: Fix Prettier formatting
-        run: npm run format:fix
 
       - name: Semantic Release
         env:
