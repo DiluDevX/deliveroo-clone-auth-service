@@ -1,3 +1,10 @@
+# [1.0.0-beta.24](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.23...v1.0.0-beta.24) (2026-03-05)
+
+
+### Features
+
+* restructure CI/CD workflows for deployment and version extraction ([8bc45e4](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/8bc45e4b34ea25541f55bff7ce73ccb866908df9))
+
 # [1.0.0-beta.23](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.22...v1.0.0-beta.23) (2026-03-05)
 
 
