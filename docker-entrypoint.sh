@@ -11,4 +11,4 @@ echo "────────────────────────�
 : "${DATABASE_URL:?❌  DATABASE_URL is not set. Aborting.}"
 
 echo "▶ Starting application..."
-exec "$@"\n
+exec "$@"
