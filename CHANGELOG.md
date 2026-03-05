@@ -1,3 +1,10 @@
+# [1.0.0-beta.34](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.33...v1.0.0-beta.34) (2026-03-05)
+
+
+### Bug Fixes
+
+* update secret output formatting in deploy workflow ([9c8ee24](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/9c8ee24318b3ece6fc9e2b97f3cdd54fad4d764e))
+
 # [1.0.0-beta.33](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.32...v1.0.0-beta.33) (2026-03-05)
 
 
