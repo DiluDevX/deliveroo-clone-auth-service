@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   release:
+    name: Deploy to Development
     uses: ./.github/workflows/deploy.yml
     with:
       environment: development

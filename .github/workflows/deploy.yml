@@ -15,6 +15,7 @@ permissions:
 
 jobs:
   release:
+    name: Run Semantic Release
     runs-on: ubuntu-latest
 
     env:
@@ -113,17 +114,52 @@ jobs:
           envs: ECR_REGISTRY,ECR_REPOSITORY,APP_VERSION,SECRET,AWS_REGION
           script: |
             set -eu
+
+            # ── Auth ────────────────────────────────────────────────────────
             aws ecr get-login-password --region "$AWS_REGION" | \
               docker login --username AWS --password-stdin "$ECR_REGISTRY"
 
+            # ── Fetch secrets from AWS Secrets Manager ──────────────────────
             aws secretsmanager get-secret-value \
               --secret-id "$SECRET" \
               --region "$AWS_REGION" \
               --query SecretString \
               --output text | jq -r 'to_entries | .[] | "\(.key)=\(.value|@json)"' > /home/ec2-user/app.env
             chmod 600 /home/ec2-user/app.env
-            trap 'rm -f /home/ec2-user/app.env' EXIT
 
+            # ── Pull latest image ───────────────────────────────────────────
             docker pull "$ECR_REGISTRY/$ECR_REPOSITORY:$APP_VERSION"
 
-            exit 0
+            # ── Stop and remove existing container if running ───────────────
+            if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+              echo "Stopping existing container: $CONTAINER_NAME"
+              docker stop "$CONTAINER_NAME"
+              docker rm "$CONTAINER_NAME"
+            fi
+
+            # ── Run new container ───────────────────────────────────────────
+            docker run -d \
+              --name "$CONTAINER_NAME" \
+              --restart unless-stopped \
+              --env-file /home/ec2-user/app.env \
+              -e APP_VERSION="$APP_VERSION" \
+              -e NODE_ENV="$ENVIRONMENT" \
+              -p "$APP_PORT:$APP_PORT" \
+              "$ECR_REGISTRY/$ECR_REPOSITORY:$APP_VERSION"
+
+            # ── Cleanup secrets file ────────────────────────────────────────
+            rm -f /home/ec2-user/app.env
+
+            # ── Verify container is running ─────────────────────────────────
+            sleep 5
+            if docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+              echo "✅ Container $CONTAINER_NAME is running"
+              docker ps --filter "name=$CONTAINER_NAME" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+            else
+              echo "❌ Container $CONTAINER_NAME failed to start"
+              docker logs "$CONTAINER_NAME" --tail 50
+              exit 1
+            fi
+
+            # ── Prune old images to free disk space ─────────────────────────
+            docker image prune -f

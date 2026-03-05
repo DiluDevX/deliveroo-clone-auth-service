@@ -12,6 +12,7 @@ on:
 
 jobs:
   extract:
+    name: Extract Version
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.extract.outputs.version }}
