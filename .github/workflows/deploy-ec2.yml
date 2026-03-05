@@ -3,8 +3,7 @@ name: Deploy To EC2
 on:
   push:
     tags:
-      - 'v*'
-  workflow_dispatch:
+      - 'v*.*.*'
 
 permissions:
   contents: read
