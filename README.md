@@ -256,8 +256,8 @@ LOG_LEVEL=info
 - `EC2_USER` - SSH username (ec2-user, ubuntu, etc.)
 - `EC2_SSH_KEY` - Private SSH key for EC2
 - `DOPPLER_TOKEN` - Doppler API token for production secrets
-- `AWS_REGION` - AWS region (e.g., eu-north-1)
-- `ECR_REPOSITORY` - ECR repository name
+- `AWS_REGION` - AWS region
+- `ECR_REPOSITORY` - ECR repo name
 
 ### CI/CD Pipelines
 
