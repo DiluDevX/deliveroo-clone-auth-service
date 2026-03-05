@@ -1,3 +1,10 @@
+# [1.0.0-beta.33](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.32...v1.0.0-beta.33) (2026-03-05)
+
+
+### Features
+
+* enhance logging of environment variables with masking for sensitive data ([63f607b](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/63f607b93923246d19d146ca3edfbb6505fb2985))
+
 # [1.0.0-beta.32](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.31...v1.0.0-beta.32) (2026-03-05)
 
 
