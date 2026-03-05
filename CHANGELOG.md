@@ -1,3 +1,10 @@
+# [1.0.0-beta.23](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.22...v1.0.0-beta.23) (2026-03-05)
+
+
+### Bug Fixes
+
+* update EC2 deployment workflow to use workflow_run and improve version resolution ([7883356](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/78833569fb93c2c5344a033a5434c383d6ff9505))
+
 # [1.0.0-beta.22](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.21...v1.0.0-beta.22) (2026-03-05)
 
 
