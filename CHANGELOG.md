@@ -1,3 +1,10 @@
+# [1.0.0-beta.30](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.29...v1.0.0-beta.30) (2026-03-05)
+
+
+### Bug Fixes
+
+* remove database URL logging and Prisma migration commands from entrypoint script ([ae5bdda](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/ae5bdda2ff4c09327b5c68cc0e3df7983ea306ed))
+
 # [1.0.0-beta.29](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.28...v1.0.0-beta.29) (2026-03-05)
 
 
