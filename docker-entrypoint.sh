@@ -15,4 +15,4 @@ echo "▶ Running Prisma migrations..."
 npm run prisma:migrate
 
 echo "▶ Starting application..."
-exec "$@"
+exec "$@"\n
