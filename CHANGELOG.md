@@ -1,3 +1,15 @@
+# [1.0.0-beta.20](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.19...v1.0.0-beta.20) (2026-03-05)
+
+
+### Bug Fixes
+
+* ensure build check is included in pre-commit hooks ([a9de839](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/a9de8393f1a81d19c5ace1cfc475796a8a53aa15))
+
+
+### Features
+
+* add build check step to PR quality checks and update release workflow ([e7acde8](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/e7acde8464c1dbcbe1762c8d24fd1b090cbfaf20))
+
 # [1.0.0-beta.19](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.18...v1.0.0-beta.19) (2026-03-05)
 
 
