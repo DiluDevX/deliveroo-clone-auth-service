@@ -1,4 +1,4 @@
-name: Extract Released Version
+name: Extract Version
 
 on:
   workflow_call:
@@ -12,7 +12,6 @@ on:
 
 jobs:
   extract:
-    name: Extract Version
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.extract.outputs.version }}

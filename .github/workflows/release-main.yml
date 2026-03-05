@@ -12,7 +12,6 @@ permissions:
 
 jobs:
   release:
-    name: Deploy to Production
     uses: ./.github/workflows/deploy.yml
     with:
       environment: production
