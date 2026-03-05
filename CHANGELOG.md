@@ -1,3 +1,10 @@
+# [1.0.0-beta.28](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.27...v1.0.0-beta.28) (2026-03-05)
+
+
+### Bug Fixes
+
+* add logging for DATABASE_URL in entrypoint script for debugging ([496a0ec](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/496a0ec0e4eccd5903651da55452258517ff2785))
+
 # [1.0.0-beta.27](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.26...v1.0.0-beta.27) (2026-03-05)
 
 
