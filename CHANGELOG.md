@@ -1,3 +1,10 @@
+# [1.0.0-beta.25](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.24...v1.0.0-beta.25) (2026-03-05)
+
+
+### Features
+
+* enhance deployment workflows with improved job naming and container management ([8008e85](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/8008e8514a87153b195f0441b12496b4b9096037))
+
 # [1.0.0-beta.24](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.23...v1.0.0-beta.24) (2026-03-05)
 
 
