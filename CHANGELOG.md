@@ -1,3 +1,10 @@
+# [1.0.0-beta.21](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.20...v1.0.0-beta.21) (2026-03-05)
+
+
+### Bug Fixes
+
+* clean up deploy workflow and update entrypoint script ([94452fd](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/94452fdf07429467351bd1ec528249298da72296))
+
 # [1.0.0-beta.20](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0-beta.19...v1.0.0-beta.20) (2026-03-05)
 
 
