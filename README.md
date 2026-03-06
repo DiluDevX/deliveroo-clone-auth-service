@@ -248,16 +248,92 @@ LOG_LEVEL=info
 
 ## Deployment
 
-### GitHub Secrets (Required)
+### GitHub Secrets Configuration
 
-- `AWS_ACCESS_KEY_ID` - AWS IAM access key
-- `AWS_SECRET_ACCESS_KEY` - AWS IAM secret key
-- `EC2_HOST` - EC2 instance IP or domain
-- `EC2_USER` - SSH username (ec2-user, ubuntu, etc.)
-- `EC2_SSH_KEY` - Private SSH key for EC2
-- `DOPPLER_TOKEN` - Doppler API token for production secrets
-- `AWS_REGION` - AWS region
-- `ECR_REPOSITORY` - ECR repo name
+Go to **Repository Settings → Secrets and variables → Actions** and add these secrets:
+
+#### Required Secrets
+
+| Secret                  | Description                                    |
+| ----------------------- | ---------------------------------------------- |
+| `AWS_ACCESS_KEY_ID`     | AWS IAM user with EC2 and ECR permissions      |
+| `AWS_SECRET_ACCESS_KEY` | AWS IAM user secret key                        |
+| `EC2_HOST`              | Public IP or DNS of your EC2 instance          |
+| `EC2_USER`              | SSH username (e.g., `ec2-user`, `ubuntu`)      |
+| `EC2_SSH_KEY`           | Private SSH key for EC2 authentication         |
+| `RELEASE_TOKEN`         | GitHub Personal Access Token with `repo` scope |
+
+#### Required Variables
+
+| Variable         | Description                   | Example                       |
+| ---------------- | ----------------------------- | ----------------------------- |
+| `AWS_REGION`     | AWS region                    | `us-east-1`                   |
+| `ECR_REPOSITORY` | ECR repository name           | `deliveroo-auth-service`      |
+| `CONTAINER_NAME` | Docker container name         | `auth-service`                |
+| `CONTAINER_PORT` | Container port                | `3000`                        |
+| `SECRET`         | AWS Secrets Manager secret ID | `deliveroo-auth-service/prod` |
+
+### AWS Secrets Manager Setup
+
+Create a secret in AWS Secrets Manager with all required environment variables:
+
+1. Go to **AWS Console → Secrets Manager → Store a new secret**
+2. Choose **Other type of secret (key/value)**
+3. Add all required keys:
+
+```json
+{
+  "DATABASE_URL": "postgresql://user:password@host:5432/dbname",
+  "JWT_SECRET": "your-jwt-secret-min-32-chars",
+  "JWT_EXPIRES_IN": "15",
+  "JWT_REFRESH_EXPIRES_IN": "7",
+  "JWT_RESET_PASSWORD_EXPIRES_IN": "1",
+  "DELIVEROO_CLONE_API_KEY": "your-api-key",
+  "SERVICE_NAME": "deliveroo-auth-service",
+  "PORT": "3000",
+  "NODE_ENV": "production",
+  "LOG_LEVEL": "info",
+  "BASE_URL": "https://api.example.com",
+  "COMPANY_NAME": "Deliveroo Clone",
+  "COMPANY_EMAIL": "noreply@deliveroo-clone.com",
+  "LOGO_URL": "https://example.com/logo.png",
+  "SUPPORT_EMAIL": "support@deliveroo-clone.com",
+  "APP_URL": "https://deliveroo-clone.com",
+  "RESEND_API_KEY": "re_xxxxxxxxxxxx"
+}
+```
+
+4. Name the secret (e.g., `deliveroo-auth-service/prod`) - use this as the `SECRET` variable in GitHub
+
+### IAM Policy for Deploy User
+
+Create an IAM user with this policy:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecr:GetAuthorizationToken",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:GetRepositoryPolicy",
+        "ecr:DescribeRepositories",
+        "ecr:ListImages",
+        "ecr:BatchGetImage"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["secretsmanager:GetSecretValue"],
+      "Resource": "arn:aws:secretsmanager:region:account:secret:deliveroo-auth-service/*"
+    }
+  ]
+}
+```
 
 ### CI/CD Pipelines
 
