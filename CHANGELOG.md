@@ -1,3 +1,10 @@
+# [1.1.0-beta.2](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.1...v1.1.0-beta.2) (2026-04-28)
+
+
+### Features
+
+* add user profile retrieval and password change functionality ([f46d96d](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/f46d96dffad8bf8f8a44f9104486c79b93c57eab))
+
 # [1.1.0-beta.1](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.0.0...v1.1.0-beta.1) (2026-03-05)
 
 
