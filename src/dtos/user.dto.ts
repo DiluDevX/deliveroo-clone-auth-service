@@ -6,6 +6,11 @@ export type GetAllUsersResponseBodyDTO = Omit<User, 'password'>[];
 
 export type GetSingleUserResponseBodyDTO = Omit<User, 'password'>;
 
+export type GetUserProfileResponseBodyDTO = Omit<
+  User,
+  'password' | 'createdAt' | 'updatedAt' | 'deletedAt'
+>;
+
 export type CreateUserRequestBodyDTO = z.infer<typeof createUserRequestBodySchema>;
 
 export type CreateUserResponseBodyDTO = Omit<User, 'password'>;

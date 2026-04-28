@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import * as authController from '../../controllers/v1/auth.controller';
 import { validateBody } from '../../middleware/validate.middleware';
+import { authenticateJwt } from '../../middleware/authentication.middleware';
 import {
+  changePasswordRequestBodySchema,
   checkEmailRequestBodySchema,
   forgotPasswordRequestBodySchema,
   loginRequestBodySchema,
@@ -13,6 +15,8 @@ import {
 } from '../../schema/auth.schema';
 
 const router = Router();
+
+router.get('/me', authenticateJwt, authController.getMe);
 
 router.post('/check-email', validateBody(checkEmailRequestBodySchema), authController.checkEmail);
 
@@ -40,6 +44,13 @@ router.post(
   '/reset-password/update',
   validateBody(resetPasswordRequestBodySchema),
   authController.resetPassword
+);
+
+router.post(
+  '/change-password',
+  authenticateJwt,
+  validateBody(changePasswordRequestBodySchema),
+  authController.changePassword
 );
 
 export default router;

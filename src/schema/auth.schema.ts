@@ -38,3 +38,8 @@ export const resetPasswordRequestBodySchema = z.object({
 export const verifyResetPasswordTokenRequestBodySchema = z.object({
   token: z.string().min(1, 'Token is required'),
 });
+
+export const changePasswordRequestBodySchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
+  newPassword: passwordSchema,
+});

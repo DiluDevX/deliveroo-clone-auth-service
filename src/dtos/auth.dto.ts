@@ -1,5 +1,6 @@
 import z from 'zod';
 import {
+  changePasswordRequestBodySchema,
   checkEmailRequestBodySchema,
   forgotPasswordRequestBodySchema,
   loginRequestBodySchema,
@@ -46,3 +47,5 @@ export type VerifyResetPasswordTokenRequestBodyDTO = z.infer<
 >;
 
 export type ResetPasswordRequestBodyDTO = z.infer<typeof resetPasswordRequestBodySchema>;
+
+export type ChangePasswordRequestBodyDTO = z.infer<typeof changePasswordRequestBodySchema>;

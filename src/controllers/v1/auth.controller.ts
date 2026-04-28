@@ -6,6 +6,7 @@ import * as resetPasswordTokenDatabaseService from '../../services/reset-passwor
 import * as usersDatabaseService from '../../services/users.database.service';
 import * as emailService from '../../services/email.service';
 import {
+  ChangePasswordRequestBodyDTO,
   CheckEmailRequestBodyDTO,
   CheckEmailResponseBodyDTO,
   ForgotPasswordRequestBodyDTO,
@@ -23,6 +24,51 @@ import { CommonResponseDTO } from '../../dtos/common.dto';
 import { ConflictError, NotFoundError, UnauthorizedError } from '../../utils/errors';
 import { comparePasswords } from '../../utils/password';
 import { StatusCodes } from 'http-status-codes';
+import { AuthenticatedRequest } from '../../middleware/authentication.middleware';
+import { GetUserProfileResponseBodyDTO } from '../../dtos/user.dto';
+
+export const getMe = async (
+  req: AuthenticatedRequest,
+  res: Response<CommonResponseDTO<GetUserProfileResponseBodyDTO>>,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      throw new UnauthorizedError('User not found in token');
+    }
+
+    logger.info({ userId }, 'Fetching current user');
+
+    const foundUser = await usersDatabaseService.findUserById(userId);
+
+    if (!foundUser || foundUser.deletedAt) {
+      throw new NotFoundError('User not found');
+    }
+
+    logger.info({ userId: foundUser.id }, 'User fetched successfully');
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: 'User fetched successfully',
+      data: {
+        id: foundUser.id,
+        firstName: foundUser.firstName,
+        lastName: foundUser.lastName,
+        email: foundUser.email,
+        phone: foundUser.phone,
+        role: foundUser.role,
+      },
+    });
+  } catch (error) {
+    logger.error(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      'Failed to fetch current user'
+    );
+    next(error);
+  }
+};
 
 export const checkEmail = async (
   req: Request<unknown, CheckEmailResponseBodyDTO, CheckEmailRequestBodyDTO>,
@@ -321,6 +367,54 @@ export const resetPassword = async (
     logger.error(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       'Password reset failed'
+    );
+    next(error);
+  }
+};
+
+export const changePassword = async (
+  req: AuthenticatedRequest,
+  res: Response<CommonResponseDTO<never>>,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user?.userId;
+    const { currentPassword, newPassword } = req.body as ChangePasswordRequestBodyDTO;
+
+    if (!userId) {
+      throw new UnauthorizedError('User not found in token');
+    }
+
+    logger.info({ userId }, 'Changing password');
+
+    const foundUser = await usersDatabaseService.findOneWithPassword({
+      id: userId,
+    });
+
+    if (!foundUser || foundUser.deletedAt) {
+      throw new NotFoundError('User not found');
+    }
+
+    const isCurrentPasswordValid = await comparePasswords(currentPassword, foundUser.password);
+
+    if (!isCurrentPasswordValid) {
+      throw new UnauthorizedError('Current password is incorrect');
+    }
+
+    await usersDatabaseService.updateUserPartially(userId, {
+      password: newPassword,
+    });
+
+    logger.info({ userId }, 'Password changed successfully');
+
+    res.status(StatusCodes.OK).json({
+      message: 'Password changed successfully',
+      success: true,
+    });
+  } catch (error) {
+    logger.error(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      'Password change failed'
     );
     next(error);
   }
