@@ -1,4 +1,3 @@
-
 /Users/diludevx/.nvm/versions/node/v24.11.1/bin/npm run lint:check
 /Users/diludevx/.nvm/versions/node/v24.11.1/bin/npm run types:check
 /Users/diludevx/.nvm/versions/node/v24.11.1/bin/npm run format:check

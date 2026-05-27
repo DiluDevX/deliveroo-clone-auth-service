@@ -83,7 +83,7 @@ jobs:
     env:
       APP_VERSION: ${{ needs.extract-version.outputs.version }}
       ENVIRONMENT: ${{ inputs.environment }}
-      ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER_DEV }}
+      ACR_LOGIN_SERVER: ${{ vars.ACR_LOGIN_SERVER_DEV }}
 
     steps:
       - name: Checkout release tag
@@ -91,18 +91,15 @@ jobs:
         with:
           ref: v${{ needs.extract-version.outputs.version }}
 
-      - name: Azure login
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS_DEV }}
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to Azure Container Registry
-        run: |
-          ACR_NAME="${ACR_LOGIN_SERVER%%.azurecr.io}"
-          az acr login --name "$ACR_NAME"
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME_DEV }}
+          password: ${{ secrets.ACR_PASSWORD_DEV }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
@@ -129,8 +126,8 @@ jobs:
           DOCKER_NETWORK: ${{ env.DOCKER_NETWORK }}
           SERVICE_DIR: ${{ env.SERVICE_DIR }}
         with:
-          host: ${{ secrets.AZURE_VM_HOST_DEV }}
-          username: ${{ secrets.AZURE_VM_USER_DEV }}
+          host: ${{ vars.AZURE_VM_HOST_DEV }}
+          username: ${{ vars.AZURE_VM_USER_DEV }}
           key: ${{ secrets.AZURE_VM_SSH_KEY_DEV }}
           envs: ACR_LOGIN_SERVER,IMAGE_NAME,APP_VERSION,CONTAINER_NAME,CONTAINER_PORT,DOCKER_NETWORK,SERVICE_DIR
           script: |
