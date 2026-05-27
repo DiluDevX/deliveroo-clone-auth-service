@@ -78,7 +78,7 @@ jobs:
     timeout-minutes: 20
     needs: extract-version
     if: needs.extract-version.outputs.published == 'true'
-    environment: develop
+    environment: ${{ inputs.environment }}
 
     env:
       APP_VERSION: ${{ needs.extract-version.outputs.version }}
