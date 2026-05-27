@@ -1,7 +1,5 @@
-#!/usr/bin/env sh
-. "$(dirname "$0")/_/husky.sh"
 
-npm run lint:check
-npm run types:check
-npm run format:check
-npm run build:check
+/Users/diludevx/.nvm/versions/node/v24.11.1/bin/npm run lint:check
+/Users/diludevx/.nvm/versions/node/v24.11.1/bin/npm run types:check
+/Users/diludevx/.nvm/versions/node/v24.11.1/bin/npm run format:check
+/Users/diludevx/.nvm/versions/node/v24.11.1/bin/npm run build:check

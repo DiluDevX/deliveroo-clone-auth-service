@@ -7,12 +7,30 @@ import type {
   DeleteUserResponseBodyDTO,
   CreateUserRequestBodyDTO,
   CreateUserResponseBodyDTO,
+  GetUserAddressesResponseBodyDTO,
+  CreateAddressRequestBodyDTO,
+  CreateAddressResponseBodyDTO,
+  UpdateAddressRequestBodyDTO,
+  UpdateAddressResponseBodyDTO,
+  DeleteAddressResponseBodyDTO,
 } from '../../dtos/user.dto';
 import { CommonResponseDTO, IdRequestPathParamsDTO } from '../../dtos/common.dto';
 import * as usersDatabaseService from '../../services/users.database.service';
-import { ConflictError, NotFoundError } from '../../utils/errors';
+import * as addressDatabaseService from '../../services/address.database.service';
+import { ConflictError, NotFoundError, UnauthorizedError } from '../../utils/errors';
 import { StatusCodes } from 'http-status-codes';
 import { logger } from '../../utils/logger';
+import { AuthenticatedRequest } from '../../middleware/authentication.middleware';
+
+const getAuthenticatedUserId = (req: unknown): string => {
+  const userId = (req as AuthenticatedRequest).user?.userId;
+
+  if (!userId) {
+    throw new UnauthorizedError('User not found in token');
+  }
+
+  return userId;
+};
 
 export const getAllUsers = async (
   _req: Request, // TODO: add query params for filtering, pagination, etc.
@@ -152,6 +170,141 @@ export const deleteUser = async (
     logger.error(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       'Failed to delete user'
+    );
+    next(error);
+  }
+};
+
+export const getMyAddresses = async (
+  req: Request<unknown, CommonResponseDTO<GetUserAddressesResponseBodyDTO>>,
+  res: Response<CommonResponseDTO<GetUserAddressesResponseBodyDTO>>,
+  next: NextFunction
+) => {
+  try {
+    const userId = getAuthenticatedUserId(req);
+    const addresses = await addressDatabaseService.findUserAddresses(userId);
+
+    logger.info({ userId, count: addresses.length }, 'User addresses retrieved successfully');
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: 'Addresses retrieved successfully',
+      data: addresses,
+    });
+  } catch (error) {
+    logger.error(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      'Failed to retrieve user addresses'
+    );
+    next(error);
+  }
+};
+
+export const createMyAddress = async (
+  req: Request<
+    unknown,
+    CommonResponseDTO<CreateAddressResponseBodyDTO>,
+    CreateAddressRequestBodyDTO
+  >,
+  res: Response<CommonResponseDTO<CreateAddressResponseBodyDTO>>,
+  next: NextFunction
+) => {
+  try {
+    const userId = getAuthenticatedUserId(req);
+    const address = await addressDatabaseService.createUserAddress(userId, req.body);
+
+    logger.info({ userId, addressId: address.id }, 'User address created successfully');
+
+    res.status(StatusCodes.CREATED).json({
+      success: true,
+      message: 'Address created successfully',
+      data: address,
+    });
+  } catch (error) {
+    logger.error(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      'Failed to create user address'
+    );
+    next(error);
+  }
+};
+
+export const updateMyAddress = async (
+  req: Request<
+    IdRequestPathParamsDTO,
+    CommonResponseDTO<UpdateAddressResponseBodyDTO>,
+    UpdateAddressRequestBodyDTO
+  >,
+  res: Response<CommonResponseDTO<UpdateAddressResponseBodyDTO>>,
+  next: NextFunction
+) => {
+  try {
+    const userId = getAuthenticatedUserId(req);
+    const address = await addressDatabaseService.updateUserAddress(userId, req.params.id, req.body);
+
+    logger.info({ userId, addressId: address.id }, 'User address updated successfully');
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: 'Address updated successfully',
+      data: address,
+    });
+  } catch (error) {
+    logger.error(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      'Failed to update user address'
+    );
+    next(error);
+  }
+};
+
+export const setMyDefaultAddress = async (
+  req: Request<IdRequestPathParamsDTO, CommonResponseDTO<UpdateAddressResponseBodyDTO>>,
+  res: Response<CommonResponseDTO<UpdateAddressResponseBodyDTO>>,
+  next: NextFunction
+) => {
+  try {
+    const userId = getAuthenticatedUserId(req);
+    const address = await addressDatabaseService.setDefaultUserAddress(userId, req.params.id);
+
+    logger.info({ userId, addressId: address.id }, 'Default user address updated successfully');
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: 'Default address updated successfully',
+      data: address,
+    });
+  } catch (error) {
+    logger.error(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      'Failed to update default user address'
+    );
+    next(error);
+  }
+};
+
+export const deleteMyAddress = async (
+  req: Request<IdRequestPathParamsDTO, CommonResponseDTO<DeleteAddressResponseBodyDTO>>,
+  res: Response<CommonResponseDTO<DeleteAddressResponseBodyDTO>>,
+  next: NextFunction
+) => {
+  try {
+    const userId = getAuthenticatedUserId(req);
+    const address = await addressDatabaseService.softDeleteUserAddress(userId, req.params.id);
+
+    logger.info({ userId, addressId: address.id }, 'User address deleted successfully');
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: 'Address deleted successfully',
+      data: {
+        id: address.id,
+      },
+    });
+  } catch (error) {
+    logger.error(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      'Failed to delete user address'
     );
     next(error);
   }

@@ -288,7 +288,7 @@ Create a secret in AWS Secrets Manager with all required environment variables:
   "JWT_EXPIRES_IN": "15",
   "JWT_REFRESH_EXPIRES_IN": "7",
   "JWT_RESET_PASSWORD_EXPIRES_IN": "1",
-  "DELIVEROO_CLONE_API_KEY": "your-api-key",
+  "BFF_API_KEY": "your-api-key",
   "SERVICE_NAME": "deliveroo-auth-service",
   "PORT": "3000",
   "NODE_ENV": "production",

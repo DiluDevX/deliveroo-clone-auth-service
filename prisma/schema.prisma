@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -21,6 +20,28 @@ model User {
   restaurantUsers RestaurantUser[]
   refreshTokens  RefreshToken[]
   passwordResets PasswordResetToken[]
+  addresses      Address[]
+}
+
+model Address {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label        String
+  line1        String
+  line2        String?
+  city         String
+  postcode     String
+  country      String   @default("UK")
+  latitude     Float?
+  longitude    Float?
+  instructions String?
+  isDefault    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  deletedAt    DateTime?
+
+  @@index([userId])
 }
 
 model RestaurantUser {

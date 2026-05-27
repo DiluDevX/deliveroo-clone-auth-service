@@ -1,6 +1,11 @@
 import z from 'zod';
-import { createUserRequestBodySchema, updateUserRequestBodySchema } from '../schema/user.schema';
-import { User } from '../../generated/prisma/client';
+import {
+  addressRequestBodySchema,
+  createUserRequestBodySchema,
+  updateAddressRequestBodySchema,
+  updateUserRequestBodySchema,
+} from '../schema/user.schema';
+import { Address, User } from '@prisma/client';
 
 export type GetAllUsersResponseBodyDTO = Omit<User, 'password'>[];
 
@@ -20,3 +25,19 @@ export type UpdateUserRequestBodyDTO = z.infer<typeof updateUserRequestBodySchem
 export type UpdateUserResponseBodyDTO = Omit<User, 'password'>;
 
 export type DeleteUserResponseBodyDTO = Omit<User, 'password'>;
+
+export type AddressResponseBodyDTO = Address;
+
+export type GetUserAddressesResponseBodyDTO = AddressResponseBodyDTO[];
+
+export type CreateAddressRequestBodyDTO = z.infer<typeof addressRequestBodySchema>;
+
+export type CreateAddressResponseBodyDTO = AddressResponseBodyDTO;
+
+export type UpdateAddressRequestBodyDTO = z.infer<typeof updateAddressRequestBodySchema>;
+
+export type UpdateAddressResponseBodyDTO = AddressResponseBodyDTO;
+
+export type DeleteAddressResponseBodyDTO = {
+  id: string;
+};

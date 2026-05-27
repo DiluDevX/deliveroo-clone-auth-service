@@ -110,7 +110,7 @@ export const environment: Environment = {
   logging: {
     level: optionalEnv('LOG_LEVEL', 'info'),
   },
-  deliverooCloneAPIKey: requireEnv('DELIVEROO_CLONE_API_KEY'),
+  deliverooCloneAPIKey: requireEnv('BFF_API_KEY'),
   mail: loadMailConfig(env),
   serviceName: requireEnv('SERVICE_NAME'),
 };

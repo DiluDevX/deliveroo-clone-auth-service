@@ -26,3 +26,20 @@ export const updateUserRequestBodySchema = z.object({
 });
 
 export type UserUpdatePartiallyInput = z.infer<typeof updateUserRequestBodySchema>;
+
+export const addressRequestBodySchema = z.object({
+  label: z.string().min(1, 'Address label is required').max(50, 'Address label too long'),
+  line1: z.string().min(1, 'Address line 1 is required').max(120, 'Address line 1 too long'),
+  line2: z.string().max(120, 'Address line 2 too long').optional(),
+  city: z.string().min(1, 'City is required').max(80, 'City too long'),
+  postcode: z.string().min(1, 'Postcode is required').max(20, 'Postcode too long'),
+  country: z.string().min(1, 'Country is required').max(80, 'Country too long').default('UK'),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
+  instructions: z.string().max(250, 'Instructions too long').optional(),
+  isDefault: z.boolean().optional(),
+});
+
+export const updateAddressRequestBodySchema = addressRequestBodySchema
+  .partial()
+  .refine((value) => Object.keys(value).length > 0, 'At least one address field is required');

@@ -14,7 +14,7 @@ permissions:
 jobs:
   release-production:
     name: Release to Production
-    uses: ./.github/workflows/deploy.yml
+    uses: ./.github/workflows/deploy-to-aws.yml
     with:
       environment: production
     secrets: inherit

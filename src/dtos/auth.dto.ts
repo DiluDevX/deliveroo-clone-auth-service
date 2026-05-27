@@ -10,7 +10,7 @@ import {
   signUpRequestBodySchema,
   verifyResetPasswordTokenRequestBodySchema,
 } from '../schema/auth.schema';
-import { User } from '../../generated/prisma/client';
+import { User } from '@prisma/client';
 
 export type CheckEmailRequestBodyDTO = z.infer<typeof checkEmailRequestBodySchema>;
 

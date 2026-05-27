@@ -4,11 +4,47 @@ import { validateBody, validateParams } from '../../middleware/validate.middlewa
 import { authenticateJwt } from '../../middleware/authentication.middleware';
 import { requireRoles, requireOwnerOrRoles } from '../../middleware/authorization.middleware';
 import { idRequestPathParamsSchema } from '../../schema/common.schema';
-import { createUserRequestBodySchema, updateUserRequestBodySchema } from '../../schema/user.schema';
+import {
+  addressRequestBodySchema,
+  createUserRequestBodySchema,
+  updateAddressRequestBodySchema,
+  updateUserRequestBodySchema,
+} from '../../schema/user.schema';
 
 const router = Router();
 
 router.get('/', authenticateJwt, requireRoles('platform_admin'), userController.getAllUsers);
+
+router.get('/me/addresses', authenticateJwt, userController.getMyAddresses);
+
+router.post(
+  '/me/addresses',
+  authenticateJwt,
+  validateBody(addressRequestBodySchema),
+  userController.createMyAddress
+);
+
+router.patch(
+  '/me/addresses/:id',
+  authenticateJwt,
+  validateParams(idRequestPathParamsSchema),
+  validateBody(updateAddressRequestBodySchema),
+  userController.updateMyAddress
+);
+
+router.patch(
+  '/me/addresses/:id/default',
+  authenticateJwt,
+  validateParams(idRequestPathParamsSchema),
+  userController.setMyDefaultAddress
+);
+
+router.delete(
+  '/me/addresses/:id',
+  authenticateJwt,
+  validateParams(idRequestPathParamsSchema),
+  userController.deleteMyAddress
+);
 
 router.get(
   '/:id',
