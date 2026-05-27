@@ -1,3 +1,10 @@
+# [1.1.0-beta.8](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.7...v1.1.0-beta.8) (2026-05-27)
+
+
+### Bug Fixes
+
+* add missing .prisma directory copy in Dockerfile ([54efb3d](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/54efb3d3001ff1ad644e46389b89b4806850190a))
+
 # [1.1.0-beta.7](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.6...v1.1.0-beta.7) (2026-05-27)
 
 
