@@ -1,3 +1,10 @@
+# [1.1.0-beta.6](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.5...v1.1.0-beta.6) (2026-05-27)
+
+
+### Bug Fixes
+
+* update Dockerfile and package.json to use correct entry point and main file path ([b7a39d4](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/b7a39d4e803eb0e427e8ec978f3910eafe2840c4))
+
 # [1.1.0-beta.5](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.4...v1.1.0-beta.5) (2026-05-27)
 
 
