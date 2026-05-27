@@ -1,3 +1,10 @@
+# [1.1.0-beta.3](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.2...v1.1.0-beta.3) (2026-05-27)
+
+
+### Features
+
+* implement address management functionality ([f0d8db3](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/f0d8db3885003ee5461ad184123f819ff9616fd4))
+
 # [1.1.0-beta.2](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.1...v1.1.0-beta.2) (2026-04-28)
 
 
