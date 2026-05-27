@@ -1,3 +1,10 @@
+# [1.1.0-beta.4](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.3...v1.1.0-beta.4) (2026-05-27)
+
+
+### Bug Fixes
+
+* update Azure deployment workflow to use vars for login server and VM credentials ([fc22ccc](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/fc22ccc3944f7c255926f92386d1e697bfaf8b91))
+
 # [1.1.0-beta.3](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.2...v1.1.0-beta.3) (2026-05-27)
 
 
