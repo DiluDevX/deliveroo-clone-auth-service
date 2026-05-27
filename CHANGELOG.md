@@ -1,3 +1,10 @@
+# [1.1.0-beta.5](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.4...v1.1.0-beta.5) (2026-05-27)
+
+
+### Bug Fixes
+
+* update Azure deployment workflow to use dynamic environment input ([06d3e5e](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/06d3e5e66904c5adc29b5945db438198fd793465))
+
 # [1.1.0-beta.4](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.3...v1.1.0-beta.4) (2026-05-27)
 
 
