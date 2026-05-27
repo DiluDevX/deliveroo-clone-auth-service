@@ -34,6 +34,7 @@ ENV ENV=$ENV \
     NODE_ENV=$ENV
 
 COPY --from=deps    --chown=app:nodejs /app/node_modules    ./node_modules
+COPY --from=builder --chown=app:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder --chown=app:nodejs /app/prisma          ./prisma
 COPY --from=builder --chown=app:nodejs /app/dist            ./dist
 COPY --from=builder --chown=app:nodejs /app/package.json    ./package.json
