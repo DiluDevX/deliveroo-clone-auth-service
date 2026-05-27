@@ -1,3 +1,10 @@
+# [1.1.0-beta.7](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.6...v1.1.0-beta.7) (2026-05-27)
+
+
+### Bug Fixes
+
+* refactor Azure deployment workflow to separate build and push steps ([acc4af6](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/acc4af63278e6c3bc9e000640c34b11c0c5ab4f1))
+
 # [1.1.0-beta.6](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.5...v1.1.0-beta.6) (2026-05-27)
 
 
