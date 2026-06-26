@@ -80,7 +80,7 @@ export const updateUserPartially = async (
     firstName: string;
     lastName: string;
     email: string;
-    phone?: string;
+    phone?: string | null;
     role: 'user' | 'platform_admin' | 'restaurant_user';
     password: string;
   }>

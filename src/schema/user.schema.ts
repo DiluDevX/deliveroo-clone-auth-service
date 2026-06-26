@@ -21,6 +21,7 @@ export const updateUserRequestBodySchema = z.object({
     .string()
     .min(10, 'Phone number should be 10 digits')
     .max(10, 'Phone number cannot be more than 10 digits')
+    .nullable()
     .optional(),
   password: passwordSchema.optional(),
 });
