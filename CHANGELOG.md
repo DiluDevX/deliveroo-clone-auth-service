@@ -1,3 +1,10 @@
+# [1.1.0-beta.9](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.8...v1.1.0-beta.9) (2026-06-26)
+
+
+### Bug Fixes
+
+* allow phone number to be nullable in user schemas and database service ([c30779f](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/c30779fb05e3099dd0b3a48be8ef8fce9647dc39))
+
 # [1.1.0-beta.8](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.7...v1.1.0-beta.8) (2026-05-27)
 
 
