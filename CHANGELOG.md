@@ -1,3 +1,10 @@
+# [1.1.0-beta.10](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.9...v1.1.0-beta.10) (2026-06-30)
+
+
+### Bug Fixes
+
+* remove unnecessary schema prefix from User table in migration files ([749e199](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/749e1993f92a87c1c590e6a67226ceb8b29c88c8))
+
 # [1.1.0-beta.9](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.8...v1.1.0-beta.9) (2026-06-26)
 
 
