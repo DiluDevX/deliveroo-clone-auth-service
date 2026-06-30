@@ -1,3 +1,10 @@
+# [1.1.0-beta.11](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.10...v1.1.0-beta.11) (2026-06-30)
+
+
+### Features
+
+* add Supabase TLS configuration for development and Azure deployment ([b2888c3](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/b2888c375b701f68845412f4dc08d0e9e4a411d8))
+
 # [1.1.0-beta.10](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.9...v1.1.0-beta.10) (2026-06-30)
 
 
