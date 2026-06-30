@@ -1,3 +1,10 @@
+# [1.1.0-beta.12](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.11...v1.1.0-beta.12) (2026-06-30)
+
+
+### Features
+
+* add schema retrieval for Prisma adapter configuration ([ba885b0](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/ba885b03898a20961478c320ca9a67e309cc0ac1))
+
 # [1.1.0-beta.11](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.10...v1.1.0-beta.11) (2026-06-30)
 
 
