@@ -226,6 +226,14 @@ deliveroo-auth-service/
 # Database
 DATABASE_URL=postgresql://user:password@localhost:5432/auth_db
 
+# Supabase development with verified TLS
+# Local paths are resolved on your machine.
+DATABASE_URL=postgresql://postgres.project-ref:password@aws-1-region.pooler.supabase.com:5432/postgres?sslmode=verify-full&sslrootcert=/absolute/path/to/prod-ca-2021.crt&schema=auth_service
+
+# Azure container paths are resolved inside the container.
+# The Azure workflow mounts SUPABASE_DB_CA_CERT_DEV at /app/certs/supabase-ca.crt.
+DATABASE_URL=postgresql://postgres.project-ref:password@aws-1-region.pooler.supabase.com:5432/postgres?sslmode=verify-full&sslrootcert=/app/certs/supabase-ca.crt&schema=auth_service
+
 # JWT
 JWT_ACCESS_SECRET=your-secret-key
 JWT_ACCESS_EXPIRES_IN=15m
