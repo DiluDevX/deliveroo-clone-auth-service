@@ -31,7 +31,7 @@ export const findOneWithoutPassword = async (
     where: {
       ...where,
       deletedAt: null,
-    } as Prisma.UserWhereInput,
+    },
     omit: {
       password: true,
     },
@@ -45,13 +45,43 @@ export const findOneWithPassword = async (
     where: {
       ...where,
       deletedAt: null,
-    } as Prisma.UserWhereInput,
+    },
   });
 };
 
 export const findUserById = async (id: string): Promise<User | null> => {
   return prisma.user.findFirst({
     where: { id, deletedAt: null },
+  });
+};
+
+export type UserProfileWithRestaurantUsers = Prisma.UserGetPayload<{
+  include: {
+    restaurantUsers: {
+      select: {
+        id: true;
+        restaurantId: true;
+        role: true;
+      };
+    };
+  };
+}>;
+
+export const findUserProfileById = async (
+  id: string
+): Promise<UserProfileWithRestaurantUsers | null> => {
+  return prisma.user.findFirst({
+    where: { id, deletedAt: null },
+    include: {
+      restaurantUsers: {
+        where: { deletedAt: null },
+        select: {
+          id: true,
+          restaurantId: true,
+          role: true,
+        },
+      },
+    },
   });
 };
 

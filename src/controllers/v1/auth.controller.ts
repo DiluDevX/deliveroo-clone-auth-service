@@ -41,11 +41,13 @@ export const getMe = async (
 
     logger.info({ userId }, 'Fetching current user');
 
-    const foundUser = await usersDatabaseService.findUserById(userId);
+    const foundUser = await usersDatabaseService.findUserProfileById(userId);
 
     if (!foundUser || foundUser.deletedAt) {
       throw new NotFoundError('User not found');
     }
+
+    const primaryRestaurant = foundUser.restaurantUsers[0];
 
     logger.info({ userId: foundUser.id }, 'User fetched successfully');
 
@@ -59,6 +61,9 @@ export const getMe = async (
         email: foundUser.email,
         phone: foundUser.phone,
         role: foundUser.role,
+        restaurantId: primaryRestaurant?.restaurantId,
+        restaurantRole: primaryRestaurant?.role,
+        restaurantUsers: foundUser.restaurantUsers,
       },
     });
   } catch (error) {

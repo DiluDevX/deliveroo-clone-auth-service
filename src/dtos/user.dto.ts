@@ -5,16 +5,26 @@ import {
   updateAddressRequestBodySchema,
   updateUserRequestBodySchema,
 } from '../schema/user.schema';
-import { Address, User } from '@prisma/client';
+import { Address, RestaurantRole, User } from '@prisma/client';
 
 export type GetAllUsersResponseBodyDTO = Omit<User, 'password'>[];
 
 export type GetSingleUserResponseBodyDTO = Omit<User, 'password'>;
 
+export type RestaurantAssignmentDTO = {
+  id: string;
+  restaurantId: string;
+  role: RestaurantRole;
+};
+
 export type GetUserProfileResponseBodyDTO = Omit<
   User,
-  'password' | 'createdAt' | 'updatedAt' | 'deletedAt'
->;
+  'password' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'restaurantUsers'
+> & {
+  restaurantId?: string;
+  restaurantRole?: RestaurantRole;
+  restaurantUsers: RestaurantAssignmentDTO[];
+};
 
 export type CreateUserRequestBodyDTO = z.infer<typeof createUserRequestBodySchema>;
 
