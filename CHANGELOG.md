@@ -1,3 +1,10 @@
+# [1.1.0-beta.13](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.12...v1.1.0-beta.13) (2026-07-01)
+
+
+### Features
+
+* enhance user profile retrieval with restaurant details ([61e8837](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/61e88377cd1b957c4453aa4b7cf8e07380655176))
+
 # [1.1.0-beta.12](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.11...v1.1.0-beta.12) (2026-06-30)
 
 
