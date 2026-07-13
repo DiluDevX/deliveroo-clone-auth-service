@@ -1,3 +1,10 @@
+# [1.1.0-beta.14](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.13...v1.1.0-beta.14) (2026-07-13)
+
+
+### Bug Fixes
+
+* trigger azure deployment ([2af4c7d](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/2af4c7d9dc765c52f8357e43e495dd25d43a92aa))
+
 # [1.1.0-beta.13](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.12...v1.1.0-beta.13) (2026-07-01)
 
 
