@@ -29,6 +29,7 @@ interface Environment {
   deliverooCloneAPIKey: string;
   serviceName: string;
   mail: MailConfig;
+  restaurantInvitationExpiresInDays: number;
 }
 
 function requireEnv(name: string): string {
@@ -112,5 +113,9 @@ export const environment: Environment = {
   },
   deliverooCloneAPIKey: requireEnv('BFF_API_KEY'),
   mail: loadMailConfig(env),
+  restaurantInvitationExpiresInDays: parsePositiveInt(
+    optionalEnv('RESTAURANT_INVITATION_EXPIRES_IN_DAYS', '7'),
+    'RESTAURANT_INVITATION_EXPIRES_IN_DAYS'
+  ),
   serviceName: requireEnv('SERVICE_NAME'),
 };

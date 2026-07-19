@@ -35,8 +35,10 @@ A production-ready microservice for authentication, user management, and restaur
 
 ### Restaurant Management
 
-- Restaurant user assignments
+- One active restaurant assignment per user
 - Role-based restaurant access (Employee, Admin, Super Admin, Finance)
+- Expiring email invitations with hashed, single-use tokens
+- Restaurant owner/admin team management with server-enforced grant rules
 - Soft delete support for restaurant relationships
 
 ## Quick Start
@@ -188,6 +190,19 @@ deliveroo-auth-service/
 - `PATCH /users/:id` - Update user profile
 - `DELETE /users/:id` - Soft delete user
 
+### Restaurant Team (`/v1/users/restaurant-team`)
+
+- `GET /restaurant-team` - List active members and pending invitations
+- `POST /restaurant-team/invitations` - Invite a grantable restaurant role
+- `DELETE /restaurant-team/invitations/:id` - Revoke a pending invitation
+- `PATCH /restaurant-team/members/:id/role` - Change a member role (owner only)
+- `DELETE /restaurant-team/members/:id` - Remove a permitted team member
+
+Public invitation acceptance is exposed through
+`GET /v1/auth/restaurant-invitations/:token` and
+`POST /v1/auth/restaurant-invitations/:token/accept`. Existing users confirm
+their password; new users choose their own password and profile name.
+
 ### Health Checks
 
 - `GET /health` - Basic health check
@@ -200,6 +215,7 @@ deliveroo-auth-service/
 
 - **User** - Application users with roles (user, platform_admin, restaurant_user)
 - **RestaurantUser** - User assignments to restaurants with roles
+- **RestaurantInvitation** - Expiring, revocable restaurant team invitations
 - **RefreshToken** - Refresh token tracking for logout
 - **PasswordResetToken** - Password reset token verification
 
@@ -244,6 +260,7 @@ JWT_RESET_PASSWORD_EXPIRES_IN=1h
 # Email
 RESEND_API_KEY=your-resend-api-key
 RESET_PASSWORD_URL=https://example.com/reset-password
+RESTAURANT_INVITATION_EXPIRES_IN_DAYS=7
 
 # API Security
 API_KEY=your-api-key

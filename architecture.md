@@ -169,6 +169,8 @@ Stack traces are included outside production.
 - Only this service issues access/refresh tokens.
 - BFF should verify access tokens or call /v1/auth/me, then inject trusted actor headers to other services.
 - Order/payment/restaurant services should not trust user identity from browser-provided headers.
+- Restaurant team invitations store only a hash of the single-use token. The auth service rechecks the inviter's live membership and grantable roles for every team mutation.
+- The current actor contract supports one active restaurant membership per user. `super_admin` can grant `admin`, `finance`, and `employee`; `admin` can grant or remove only `employee`.
 
 ## Smoke Test
 
