@@ -1,3 +1,10 @@
+# [1.1.0-beta.15](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.14...v1.1.0-beta.15) (2026-07-19)
+
+
+### Features
+
+* implement restaurant team management with invitations and roles ([e20271e](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/e20271e464f79ac3711c1ceb7e20665537d5a0d0))
+
 # [1.1.0-beta.14](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.13...v1.1.0-beta.14) (2026-07-13)
 
 
