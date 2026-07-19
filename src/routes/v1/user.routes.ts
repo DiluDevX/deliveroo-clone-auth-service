@@ -10,6 +10,12 @@ import {
   updateAddressRequestBodySchema,
   updateUserRequestBodySchema,
 } from '../../schema/user.schema';
+import * as restaurantTeamController from '../../controllers/v1/restaurant-team.controller';
+import {
+  createRestaurantInvitationRequestBodySchema,
+  restaurantTeamResourcePathParamsSchema,
+  updateRestaurantMemberRoleRequestBodySchema,
+} from '../../schema/restaurant-team.schema';
 
 const router = Router();
 
@@ -44,6 +50,46 @@ router.delete(
   authenticateJwt,
   validateParams(idRequestPathParamsSchema),
   userController.deleteMyAddress
+);
+
+router.get(
+  '/restaurant-team',
+  authenticateJwt,
+  requireRoles('restaurant_user'),
+  restaurantTeamController.getRestaurantTeam
+);
+
+router.post(
+  '/restaurant-team/invitations',
+  authenticateJwt,
+  requireRoles('restaurant_user'),
+  validateBody(createRestaurantInvitationRequestBodySchema),
+  restaurantTeamController.createRestaurantInvitation
+);
+
+router.delete(
+  '/restaurant-team/invitations/:id',
+  authenticateJwt,
+  requireRoles('restaurant_user'),
+  validateParams(restaurantTeamResourcePathParamsSchema),
+  restaurantTeamController.cancelRestaurantInvitation
+);
+
+router.patch(
+  '/restaurant-team/members/:id/role',
+  authenticateJwt,
+  requireRoles('restaurant_user'),
+  validateParams(restaurantTeamResourcePathParamsSchema),
+  validateBody(updateRestaurantMemberRoleRequestBodySchema),
+  restaurantTeamController.updateRestaurantMemberRole
+);
+
+router.delete(
+  '/restaurant-team/members/:id',
+  authenticateJwt,
+  requireRoles('restaurant_user'),
+  validateParams(restaurantTeamResourcePathParamsSchema),
+  restaurantTeamController.removeRestaurantMember
 );
 
 router.get(

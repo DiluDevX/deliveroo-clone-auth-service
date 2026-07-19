@@ -7,52 +7,74 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  firstName String
-  lastName  String
-  email     String
-  phone     String?
-  password  String
-  role      Role     @default(user)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
-  restaurantUsers RestaurantUser[]
-  refreshTokens  RefreshToken[]
-  passwordResets PasswordResetToken[]
-  addresses      Address[]
+  id                        String                 @id @default(uuid())
+  firstName                 String
+  lastName                  String
+  email                     String
+  phone                     String?
+  password                  String
+  role                      Role                   @default(user)
+  createdAt                 DateTime               @default(now())
+  updatedAt                 DateTime               @updatedAt
+  deletedAt                 DateTime?
+  restaurantUsers           RestaurantUser[]
+  refreshTokens             RefreshToken[]
+  passwordResets            PasswordResetToken[]
+  addresses                 Address[]
+  restaurantInvitationsSent RestaurantInvitation[] @relation("RestaurantInvitationSender")
 }
 
 model Address {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   label        String
   line1        String
   line2        String?
   city         String
   postcode     String
-  country      String   @default("UK")
+  country      String    @default("UK")
   latitude     Float?
   longitude    Float?
   instructions String?
-  isDefault    Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  isDefault    Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
   deletedAt    DateTime?
 
   @@index([userId])
 }
 
 model RestaurantUser {
-  id           String   @id @default(uuid())
+  id           String         @id @default(uuid())
   role         RestaurantRole @default(employee)
   restaurantId String
   userId       String
-  user         User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
   deletedAt    DateTime?
+
+  @@index([restaurantId, deletedAt])
+  @@index([userId, deletedAt])
+}
+
+model RestaurantInvitation {
+  id           String         @id @default(uuid())
+  email        String
+  restaurantId String
+  role         RestaurantRole
+  tokenHash    String         @unique
+  invitedById  String
+  invitedBy    User           @relation("RestaurantInvitationSender", fields: [invitedById], references: [id], onDelete: Cascade)
+  expiresAt    DateTime
+  acceptedAt   DateTime?
+  revokedAt    DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([restaurantId, email])
+  @@index([email, acceptedAt, revokedAt])
 }
 
 model RefreshToken {

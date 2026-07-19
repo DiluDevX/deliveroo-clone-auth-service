@@ -13,6 +13,12 @@ import {
   signUpRequestBodySchema,
   resetPasswordRequestBodySchema,
 } from '../../schema/auth.schema';
+import * as restaurantTeamController from '../../controllers/v1/restaurant-team.controller';
+import {
+  acceptRestaurantInvitationRequestBodySchema,
+  restaurantInvitationTokenPathParamsSchema,
+} from '../../schema/restaurant-team.schema';
+import { validateParams } from '../../middleware/validate.middleware';
 
 const router = Router();
 
@@ -32,6 +38,19 @@ router.post(
   '/forgot-password',
   validateBody(forgotPasswordRequestBodySchema),
   authController.forgotPassword
+);
+
+router.get(
+  '/restaurant-invitations/:token',
+  validateParams(restaurantInvitationTokenPathParamsSchema),
+  restaurantTeamController.getRestaurantInvitationPreview
+);
+
+router.post(
+  '/restaurant-invitations/:token/accept',
+  validateParams(restaurantInvitationTokenPathParamsSchema),
+  validateBody(acceptRestaurantInvitationRequestBodySchema),
+  restaurantTeamController.acceptRestaurantInvitation
 );
 
 router.post(
