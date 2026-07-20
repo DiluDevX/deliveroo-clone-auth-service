@@ -73,7 +73,7 @@ jobs:
           # TODO check what is cache-from and cache-to is
 
       - name: Pull and run on EC2
-        uses: appleboy/ssh-action@1530429296e979861824d74fb800013190b5dee0
+        uses: appleboy/ssh-action@b838bc2f27cd449b957159452d432aff91697637
         id: deploy
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
