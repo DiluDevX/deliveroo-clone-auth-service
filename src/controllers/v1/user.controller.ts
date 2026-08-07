@@ -7,6 +7,8 @@ import type {
   DeleteUserResponseBodyDTO,
   CreateUserRequestBodyDTO,
   CreateUserResponseBodyDTO,
+  ProvisionRestaurantOwnerRequestBodyDTO,
+  ProvisionRestaurantOwnerResponseBodyDTO,
   GetUserAddressesResponseBodyDTO,
   CreateAddressRequestBodyDTO,
   CreateAddressResponseBodyDTO,
@@ -21,6 +23,7 @@ import { ConflictError, NotFoundError, UnauthorizedError } from '../../utils/err
 import { StatusCodes } from 'http-status-codes';
 import { logger } from '../../utils/logger';
 import { AuthenticatedRequest } from '../../middleware/authentication.middleware';
+import * as restaurantOwnerDatabaseService from '../../services/restaurant-owner.database.service';
 
 const getAuthenticatedUserId = (req: unknown): string => {
   const userId = (req as AuthenticatedRequest).user?.userId;
@@ -121,6 +124,39 @@ export const createUser = async (
       { error: error instanceof Error ? error.message : 'Unknown error' },
       'Failed to create user'
     );
+    next(error);
+  }
+};
+
+export const provisionRestaurantOwner = async (
+  req: Request<
+    unknown,
+    CommonResponseDTO<ProvisionRestaurantOwnerResponseBodyDTO>,
+    ProvisionRestaurantOwnerRequestBodyDTO
+  >,
+  res: Response<CommonResponseDTO<ProvisionRestaurantOwnerResponseBodyDTO>>,
+  next: NextFunction
+) => {
+  try {
+    const result = await restaurantOwnerDatabaseService.provisionRestaurantOwner(req.body);
+
+    logger.info(
+      {
+        userId: result.user.id,
+        restaurantId: result.membership.restaurantId,
+        created: result.created,
+      },
+      'Restaurant owner provisioned successfully'
+    );
+
+    res.status(result.created ? StatusCodes.CREATED : StatusCodes.OK).json({
+      success: true,
+      message: result.created
+        ? 'Restaurant owner provisioned successfully'
+        : 'Restaurant owner already provisioned',
+      data: result,
+    });
+  } catch (error) {
     next(error);
   }
 };

@@ -2,6 +2,7 @@ import z from 'zod';
 import {
   addressRequestBodySchema,
   createUserRequestBodySchema,
+  provisionRestaurantOwnerRequestBodySchema,
   updateAddressRequestBodySchema,
   updateUserRequestBodySchema,
 } from '../schema/user.schema';
@@ -29,6 +30,16 @@ export type GetUserProfileResponseBodyDTO = Omit<
 export type CreateUserRequestBodyDTO = z.infer<typeof createUserRequestBodySchema>;
 
 export type CreateUserResponseBodyDTO = Omit<User, 'password'>;
+
+export type ProvisionRestaurantOwnerRequestBodyDTO = z.infer<
+  typeof provisionRestaurantOwnerRequestBodySchema
+>;
+
+export type ProvisionRestaurantOwnerResponseBodyDTO = {
+  user: Omit<User, 'password'>;
+  membership: RestaurantAssignmentDTO;
+  created: boolean;
+};
 
 export type UpdateUserRequestBodyDTO = z.infer<typeof updateUserRequestBodySchema>;
 

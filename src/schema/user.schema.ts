@@ -13,6 +13,12 @@ export const createUserRequestBodySchema = z.object({
   password: passwordSchema,
 });
 
+export const provisionRestaurantOwnerRequestBodySchema = createUserRequestBodySchema
+  .pick({ firstName: true, lastName: true, email: true, password: true })
+  .extend({
+    restaurantId: z.string().min(1, 'Restaurant id is required'),
+  });
+
 export const updateUserRequestBodySchema = z.object({
   firstName: z.string().min(1, 'First name is required').max(50, 'First name too long').optional(),
   lastName: z.string().min(1, 'Last name is required').max(50, 'Last name too long').optional(),
