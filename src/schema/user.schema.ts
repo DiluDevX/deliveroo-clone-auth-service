@@ -16,7 +16,7 @@ export const createUserRequestBodySchema = z.object({
 export const provisionRestaurantOwnerRequestBodySchema = createUserRequestBodySchema
   .pick({ firstName: true, lastName: true, email: true, password: true })
   .extend({
-    restaurantId: z.string().min(1, 'Restaurant id is required'),
+    restaurantId: z.string().trim().min(1, 'Restaurant id is required'),
   });
 
 export const updateUserRequestBodySchema = z.object({
