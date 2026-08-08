@@ -22,6 +22,7 @@ model User {
   passwordResets            PasswordResetToken[]
   addresses                 Address[]
   restaurantInvitationsSent RestaurantInvitation[] @relation("RestaurantInvitationSender")
+  restaurantOwnerships      RestaurantOwnership[]  @relation("RestaurantOwnershipOwner")
 }
 
 model Address {
@@ -59,19 +60,39 @@ model RestaurantUser {
   @@index([userId, deletedAt])
 }
 
+model RestaurantOwnership {
+  id             String                    @id @default(uuid())
+  restaurantId   String                    @unique
+  provisioningId String                    @unique
+  ownerFirstName String
+  ownerLastName  String
+  ownerEmail     String                    @unique
+  status         RestaurantOwnershipStatus @default(INVITED)
+  invitationId   String                    @unique
+  invitation     RestaurantInvitation      @relation(fields: [invitationId], references: [id], onDelete: Restrict)
+  ownerUserId    String?
+  ownerUser      User?                     @relation("RestaurantOwnershipOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+  acceptedAt     DateTime?
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+
+  @@index([status, updatedAt])
+}
+
 model RestaurantInvitation {
-  id           String         @id @default(uuid())
-  email        String
-  restaurantId String
-  role         RestaurantRole
-  tokenHash    String         @unique
-  invitedById  String
-  invitedBy    User           @relation("RestaurantInvitationSender", fields: [invitedById], references: [id], onDelete: Cascade)
-  expiresAt    DateTime
-  acceptedAt   DateTime?
-  revokedAt    DateTime?
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+  id                  String               @id @default(uuid())
+  email               String
+  restaurantId        String
+  role                RestaurantRole
+  tokenHash           String               @unique
+  invitedById         String
+  invitedBy           User                 @relation("RestaurantInvitationSender", fields: [invitedById], references: [id], onDelete: Cascade)
+  expiresAt           DateTime
+  acceptedAt          DateTime?
+  revokedAt           DateTime?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  restaurantOwnership RestaurantOwnership?
 
   @@index([restaurantId, email])
   @@index([email, acceptedAt, revokedAt])
@@ -106,4 +127,9 @@ enum RestaurantRole {
   super_admin
   admin
   finance
+}
+
+enum RestaurantOwnershipStatus {
+  INVITED
+  ACCEPTED
 }

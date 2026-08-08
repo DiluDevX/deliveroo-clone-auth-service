@@ -146,8 +146,8 @@ Mounted under /v1/users. These routes use Bearer auth and role checks:
 - GET /v1/users: platform_admin only
 - GET /v1/users/:id: owner or platform_admin
 - POST /v1/users: platform_admin
-- POST /v1/users/restaurant-owners: platform_admin only; atomically creates the initial
-  `restaurant_user` and `super_admin` membership, or returns the matching existing owner on retry
+- POST /v1/users/restaurant-owner-invitations: platform_admin only; atomically reserves unique
+  restaurant ownership and creates a short-lived owner invitation
 - PATCH /v1/users/:id: owner or platform_admin
 - DELETE /v1/users/:id: platform_admin
 
@@ -173,9 +173,10 @@ Stack traces are included outside production.
 - Order/payment/restaurant services should not trust user identity from browser-provided headers.
 - Restaurant team invitations store only a hash of the single-use token. The auth service rechecks the inviter's live membership and grantable roles for every team mutation.
 - The current actor contract supports one active restaurant membership per user. `super_admin` can grant `admin`, `finance`, and `employee`; `admin` can grant or remove only `employee`.
-- Initial restaurant ownership is separate from team invitations. A platform admin provisions it in a
-  transaction serialized per restaurant; a second owner or an email used by another active account is
-  rejected.
+- Initial restaurant ownership has a dedicated record with unique restaurant and provisioning ids.
+  Creation is serialized per restaurant and stores only a hash of the short-lived invitation token.
+  The owner chooses or confirms their password during invitation acceptance; only that transaction
+  creates the `super_admin` membership and marks ownership accepted.
 
 ## Smoke Test
 

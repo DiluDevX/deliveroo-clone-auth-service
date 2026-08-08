@@ -7,8 +7,8 @@ import type {
   DeleteUserResponseBodyDTO,
   CreateUserRequestBodyDTO,
   CreateUserResponseBodyDTO,
-  ProvisionRestaurantOwnerRequestBodyDTO,
-  ProvisionRestaurantOwnerResponseBodyDTO,
+  CreateRestaurantOwnerInvitationRequestBodyDTO,
+  CreateRestaurantOwnerInvitationResponseBodyDTO,
   GetUserAddressesResponseBodyDTO,
   CreateAddressRequestBodyDTO,
   CreateAddressResponseBodyDTO,
@@ -23,7 +23,7 @@ import { ConflictError, NotFoundError, UnauthorizedError } from '../../utils/err
 import { StatusCodes } from 'http-status-codes';
 import { logger } from '../../utils/logger';
 import { AuthenticatedRequest } from '../../middleware/authentication.middleware';
-import * as restaurantOwnerDatabaseService from '../../services/restaurant-owner.database.service';
+import * as restaurantOwnerInvitationService from '../../services/restaurant-owner-invitation.service';
 
 const getAuthenticatedUserId = (req: unknown): string => {
   const userId = (req as AuthenticatedRequest).user?.userId;
@@ -128,32 +128,37 @@ export const createUser = async (
   }
 };
 
-export const provisionRestaurantOwner = async (
+export const createRestaurantOwnerInvitation = async (
   req: Request<
     unknown,
-    CommonResponseDTO<ProvisionRestaurantOwnerResponseBodyDTO>,
-    ProvisionRestaurantOwnerRequestBodyDTO
+    CommonResponseDTO<CreateRestaurantOwnerInvitationResponseBodyDTO>,
+    CreateRestaurantOwnerInvitationRequestBodyDTO
   >,
-  res: Response<CommonResponseDTO<ProvisionRestaurantOwnerResponseBodyDTO>>,
+  res: Response<CommonResponseDTO<CreateRestaurantOwnerInvitationResponseBodyDTO>>,
   next: NextFunction
 ) => {
   try {
-    const result = await restaurantOwnerDatabaseService.provisionRestaurantOwner(req.body);
+    const platformAdminUserId = getAuthenticatedUserId(req);
+    const result = await restaurantOwnerInvitationService.createRestaurantOwnerInvitation(
+      req.body,
+      platformAdminUserId
+    );
 
     logger.info(
       {
-        userId: result.user.id,
-        restaurantId: result.membership.restaurantId,
+        ownershipId: result.ownership.id,
+        restaurantId: result.ownership.restaurantId,
+        invitationId: result.invitation.id,
         created: result.created,
       },
-      'Restaurant owner provisioned successfully'
+      'Restaurant owner invitation reserved'
     );
 
     res.status(result.created ? StatusCodes.CREATED : StatusCodes.OK).json({
       success: true,
       message: result.created
-        ? 'Restaurant owner provisioned successfully'
-        : 'Restaurant owner already provisioned',
+        ? 'Restaurant owner invitation sent successfully'
+        : 'Restaurant ownership is already reserved',
       data: result,
     });
   } catch (error) {

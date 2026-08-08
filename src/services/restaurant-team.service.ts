@@ -14,6 +14,7 @@ import {
 import { hashToken } from '../utils/jwt';
 import { comparePasswords, hashPassword } from '../utils/password';
 import * as emailService from './email.service';
+import * as restaurantOwnershipDatabaseService from './restaurant-ownership.database.service';
 import * as restaurantTeamDatabaseService from './restaurant-team.database.service';
 import * as usersDatabaseService from './users.database.service';
 
@@ -196,8 +197,8 @@ export const cancelRestaurantInvitation = async (userId: string, invitationId: s
   await restaurantTeamDatabaseService.revokeInvitation(invitationId);
 };
 
-const getActiveInvitation = async (token: string) => {
-  const invitation = await restaurantTeamDatabaseService.findInvitationByTokenHash(
+const getInvitationForAcceptance = async (token: string) => {
+  const invitation = await restaurantTeamDatabaseService.findInvitationByTokenHashForAcceptance(
     hashToken(token)
   );
   if (!invitation) {
@@ -207,7 +208,13 @@ const getActiveInvitation = async (token: string) => {
 };
 
 export const getRestaurantInvitationPreview = async (token: string) => {
-  const invitation = await getActiveInvitation(token);
+  const invitation = await getInvitationForAcceptance(token);
+  const ownership = await restaurantOwnershipDatabaseService.findOwnershipByInvitationId(
+    invitation.id
+  );
+  if (invitation.acceptedAt && !ownership) {
+    throw new ConflictError('This restaurant invitation has already been used');
+  }
   const existingUser = await usersDatabaseService.findOneWithoutPassword({
     email: invitation.email,
   });
@@ -224,7 +231,13 @@ export const acceptRestaurantInvitation = async (
   token: string,
   input: { firstName?: string; lastName?: string; password: string }
 ) => {
-  const invitation = await getActiveInvitation(token);
+  const invitation = await getInvitationForAcceptance(token);
+  const ownership = await restaurantOwnershipDatabaseService.findOwnershipByInvitationId(
+    invitation.id
+  );
+  if (invitation.acceptedAt && !ownership) {
+    throw new ConflictError('This restaurant invitation has already been used');
+  }
   const existingUser = await usersDatabaseService.findOneWithPassword({ email: invitation.email });
 
   if (existingUser) {
@@ -239,27 +252,33 @@ export const acceptRestaurantInvitation = async (
     const existingMembership = await restaurantTeamDatabaseService.findActiveMembershipByUserId(
       existingUser.id
     );
-    if (existingMembership) {
+    const isAcceptedOwnerRetry =
+      ownership?.status === 'ACCEPTED' &&
+      ownership.ownerUserId === existingUser.id &&
+      existingMembership?.restaurantId === ownership.restaurantId &&
+      existingMembership.role === 'super_admin';
+    if (existingMembership && !isAcceptedOwnerRetry) {
       throw new ConflictError('This account already belongs to a restaurant');
     }
-  } else if (!input.firstName || !input.lastName) {
+  } else if (!ownership && (!input.firstName || !input.lastName)) {
     throw new BadRequestError('First and last name are required for a new account');
   }
 
-  let membership;
+  let acceptanceResult;
 
   try {
-    membership = await restaurantTeamDatabaseService.acceptInvitation({
+    acceptanceResult = await restaurantTeamDatabaseService.acceptInvitation({
       invitationId: invitation.id,
       email: invitation.email,
       restaurantId: invitation.restaurantId,
       role: invitation.role,
+      ownershipId: ownership?.id,
       existingUserId: existingUser?.id,
       newUser: existingUser
         ? undefined
         : {
-            firstName: input.firstName ?? '',
-            lastName: input.lastName ?? '',
+            firstName: ownership?.ownerFirstName ?? input.firstName ?? '',
+            lastName: ownership?.ownerLastName ?? input.lastName ?? '',
             password: await hashPassword(input.password),
           },
     });
@@ -271,7 +290,7 @@ export const acceptRestaurantInvitation = async (
     throw error;
   }
 
-  if (!membership) {
+  if (!acceptanceResult) {
     throw new ConflictError('This restaurant invitation has already been used');
   }
 
@@ -279,5 +298,6 @@ export const acceptRestaurantInvitation = async (
     email: invitation.email,
     restaurantId: invitation.restaurantId,
     role: invitation.role,
+    provisioningId: acceptanceResult.ownership?.provisioningId,
   };
 };

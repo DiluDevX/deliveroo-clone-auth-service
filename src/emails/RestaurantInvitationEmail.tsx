@@ -15,6 +15,7 @@ import React from 'react';
 type RestaurantInvitationEmailProps = {
   invitationUrl: string;
   role: string;
+  restaurantName?: string;
   companyName: string;
   supportEmail: string;
   logoUrl: string;
@@ -29,54 +30,76 @@ const formatRole = (role: string): string =>
 export const RestaurantInvitationEmail = ({
   invitationUrl,
   role,
+  restaurantName,
   companyName,
   supportEmail,
   logoUrl,
-}: RestaurantInvitationEmailProps) => (
-  <Html>
-    <Head />
-    <Preview>You have been invited to join a restaurant team on {companyName}</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Section style={header}>
-          <Img src={logoUrl} alt={companyName} style={logo} />
-        </Section>
-        <Section style={content}>
-          <Text style={title}>Join Your Restaurant Team</Text>
-          <Text style={message}>
-            You have been invited to join a restaurant on {companyName} as{' '}
-            <strong>{formatRole(role)}</strong>.
-          </Text>
-          <Section style={buttonContainer}>
-            <Button style={button} href={invitationUrl}>
-              Accept Invitation
-            </Button>
+}: RestaurantInvitationEmailProps) => {
+  const isOwnerInvitation = role === 'super_admin';
+
+  return (
+    <Html>
+      <Head />
+      <Preview>
+        {isOwnerInvitation
+          ? `Set up your owner account for ${restaurantName ?? 'your restaurant'}`
+          : `You have been invited to join a restaurant team on ${companyName}`}
+      </Preview>
+      <Body style={main}>
+        <Container style={container}>
+          <Section style={header}>
+            <Img src={logoUrl} alt={companyName} style={logo} />
           </Section>
-          <Text style={helperText}>
-            If you already have an account, you will confirm your existing password. Otherwise, you
-            can create your account after opening the invitation.
-          </Text>
-          <Text style={helperText}>
-            If the button does not work, open{' '}
-            <Link href={invitationUrl} style={link}>
-              this invitation link
-            </Link>
-            .
-          </Text>
-        </Section>
-        <Section style={footer}>
-          <Text style={footerText}>This invitation expires for security reasons.</Text>
-          <Text style={footerText}>
-            Need help?{' '}
-            <Link href={`mailto:${supportEmail}`} style={link}>
-              {supportEmail}
-            </Link>
-          </Text>
-        </Section>
-      </Container>
-    </Body>
-  </Html>
-);
+          <Section style={content}>
+            <Text style={title}>
+              {isOwnerInvitation
+                ? 'Set Up Your Restaurant Owner Account'
+                : 'Join Your Restaurant Team'}
+            </Text>
+            <Text style={message}>
+              {isOwnerInvitation ? (
+                <>
+                  You have been selected as the owner and administrator of{' '}
+                  <strong>{restaurantName ?? 'your restaurant'}</strong> on {companyName}.
+                </>
+              ) : (
+                <>
+                  You have been invited to join a restaurant on {companyName} as{' '}
+                  <strong>{formatRole(role)}</strong>.
+                </>
+              )}
+            </Text>
+            <Section style={buttonContainer}>
+              <Button style={button} href={invitationUrl}>
+                {isOwnerInvitation ? 'Set Up Owner Account' : 'Accept Invitation'}
+              </Button>
+            </Section>
+            <Text style={helperText}>
+              If you already have an account, you will confirm your existing password. Otherwise,
+              you can create your account after opening the invitation.
+            </Text>
+            <Text style={helperText}>
+              If the button does not work, open{' '}
+              <Link href={invitationUrl} style={link}>
+                this invitation link
+              </Link>
+              .
+            </Text>
+          </Section>
+          <Section style={footer}>
+            <Text style={footerText}>This invitation expires for security reasons.</Text>
+            <Text style={footerText}>
+              Need help?{' '}
+              <Link href={`mailto:${supportEmail}`} style={link}>
+                {supportEmail}
+              </Link>
+            </Text>
+          </Section>
+        </Container>
+      </Body>
+    </Html>
+  );
+};
 
 const main = {
   backgroundColor: '#f6f6f6',

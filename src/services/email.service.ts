@@ -34,13 +34,15 @@ export const sendResetPasswordEmail = async (to: string, token: string) => {
 export const sendRestaurantInvitationEmail = async (
   to: string,
   token: string,
-  role: string
+  role: string,
+  restaurantName?: string
 ): Promise<void> => {
   const invitationUrl = `${environment.mail.appUrl}/account/restaurant-invitation?token=${encodeURIComponent(token)}`;
   const html = await render(
     RestaurantInvitationEmail({
       invitationUrl,
       role,
+      restaurantName,
       companyName: environment.mail.companyName,
       supportEmail: environment.mail.supportEmail,
       logoUrl: environment.mail.logoUrl,
@@ -50,7 +52,10 @@ export const sendRestaurantInvitationEmail = async (
   const { error } = await resend.emails.send({
     from: `${environment.mail.companyName} <${environment.mail.companyEmail}>`,
     to,
-    subject: `You have been invited to join ${environment.mail.companyName}`,
+    subject:
+      role === 'super_admin'
+        ? `Set up your owner account for ${restaurantName ?? 'your restaurant'}`
+        : `You have been invited to join ${environment.mail.companyName}`,
     html,
   });
 

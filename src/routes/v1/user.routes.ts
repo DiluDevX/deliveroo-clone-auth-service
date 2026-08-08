@@ -9,7 +9,7 @@ import {
   createUserRequestBodySchema,
   updateAddressRequestBodySchema,
   updateUserRequestBodySchema,
-  provisionRestaurantOwnerRequestBodySchema,
+  createRestaurantOwnerInvitationRequestBodySchema,
 } from '../../schema/user.schema';
 import * as restaurantTeamController from '../../controllers/v1/restaurant-team.controller';
 import {
@@ -102,11 +102,11 @@ router.get(
 );
 
 router.post(
-  '/restaurant-owners',
+  '/restaurant-owner-invitations',
   authenticateJwt,
-  validateBody(provisionRestaurantOwnerRequestBodySchema),
+  validateBody(createRestaurantOwnerInvitationRequestBodySchema),
   requireRoles('platform_admin'),
-  userController.provisionRestaurantOwner
+  userController.createRestaurantOwnerInvitation
 );
 
 router.post(

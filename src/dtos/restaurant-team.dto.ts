@@ -59,4 +59,5 @@ export type AcceptRestaurantInvitationResponseBodyDTO = {
   email: string;
   restaurantId: string;
   role: RestaurantRole;
+  provisioningId?: string;
 };
