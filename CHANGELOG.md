@@ -1,3 +1,13 @@
+# [1.1.0-beta.16](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.15...v1.1.0-beta.16) (2026-08-08)
+
+
+### Features
+
+* add restaurant owner provisioning functionality with role assignment ([d59337d](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/d59337dad17dcbd43d9d60c9418a4ae5bc84de0e))
+* enhance restaurant owner invitation process with expiration handling and validation ([b7b328d](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/b7b328d9aa628fed910e9317e3300a577a5f15a2))
+* enhance restaurant owner provisioning with transaction handling and conflict resolution ([733e83a](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/733e83a76b9cf4fdf0bfc4b305d3d200d4743c6f))
+* implement restaurant owner invitation system with unique ownership reservations ([c197710](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/c1977103a172fd37b74a993b98dddb5459b8868a))
+
 # [1.1.0-beta.15](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.14...v1.1.0-beta.15) (2026-07-19)
 
 
