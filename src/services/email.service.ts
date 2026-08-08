@@ -3,7 +3,9 @@ import { render } from '@react-email/components';
 import { environment } from '../config/environment';
 import { InternalServerError } from '../utils/errors';
 import ResetPasswordEmail from '../emails/ResetPasswordEmail';
-import RestaurantInvitationEmail from '../emails/RestaurantInvitationEmail';
+import RestaurantInvitationEmail, {
+  buildOwnerInvitationSubject,
+} from '../emails/RestaurantInvitationEmail';
 
 const resend = new Resend(environment.mail.resendApiKey);
 
@@ -35,6 +37,7 @@ export const sendRestaurantInvitationEmail = async (
   to: string,
   token: string,
   role: string,
+  expiresAt: Date,
   restaurantName?: string
 ): Promise<void> => {
   const invitationUrl = `${environment.mail.appUrl}/account/restaurant-invitation?token=${encodeURIComponent(token)}`;
@@ -43,6 +46,7 @@ export const sendRestaurantInvitationEmail = async (
       invitationUrl,
       role,
       restaurantName,
+      expiresAt,
       companyName: environment.mail.companyName,
       supportEmail: environment.mail.supportEmail,
       logoUrl: environment.mail.logoUrl,
@@ -54,7 +58,7 @@ export const sendRestaurantInvitationEmail = async (
     to,
     subject:
       role === 'super_admin'
-        ? `Set up your owner account for ${restaurantName ?? 'your restaurant'}`
+        ? buildOwnerInvitationSubject(restaurantName)
         : `You have been invited to join ${environment.mail.companyName}`,
     html,
   });

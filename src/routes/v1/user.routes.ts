@@ -104,8 +104,8 @@ router.get(
 router.post(
   '/restaurant-owner-invitations',
   authenticateJwt,
-  validateBody(createRestaurantOwnerInvitationRequestBodySchema),
   requireRoles('platform_admin'),
+  validateBody(createRestaurantOwnerInvitationRequestBodySchema),
   userController.createRestaurantOwnerInvitation
 );
 

@@ -114,7 +114,12 @@ export const createRestaurantInvitation = async (
   });
 
   try {
-    await emailService.sendRestaurantInvitationEmail(input.email, token, input.role);
+    await emailService.sendRestaurantInvitationEmail(
+      input.email,
+      token,
+      input.role,
+      invitation.expiresAt
+    );
   } catch (error) {
     await restaurantTeamDatabaseService.revokeInvitation(invitation.id);
     throw error;

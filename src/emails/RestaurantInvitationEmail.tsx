@@ -16,6 +16,7 @@ type RestaurantInvitationEmailProps = {
   invitationUrl: string;
   role: string;
   restaurantName?: string;
+  expiresAt: Date;
   companyName: string;
   supportEmail: string;
   logoUrl: string;
@@ -27,10 +28,24 @@ const formatRole = (role: string): string =>
     .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
     .join(' ');
 
+const getRestaurantName = (restaurantName?: string): string =>
+  restaurantName?.trim() || 'your restaurant';
+
+export const buildOwnerInvitationSubject = (restaurantName?: string): string =>
+  `Set up your owner account for ${getRestaurantName(restaurantName)}`;
+
+const formatExpiration = (expiresAt: Date): string =>
+  new Intl.DateTimeFormat('en-GB', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: 'UTC',
+  }).format(expiresAt);
+
 export const RestaurantInvitationEmail = ({
   invitationUrl,
   role,
   restaurantName,
+  expiresAt,
   companyName,
   supportEmail,
   logoUrl,
@@ -42,7 +57,7 @@ export const RestaurantInvitationEmail = ({
       <Head />
       <Preview>
         {isOwnerInvitation
-          ? `Set up your owner account for ${restaurantName ?? 'your restaurant'}`
+          ? buildOwnerInvitationSubject(restaurantName)
           : `You have been invited to join a restaurant team on ${companyName}`}
       </Preview>
       <Body style={main}>
@@ -60,7 +75,7 @@ export const RestaurantInvitationEmail = ({
               {isOwnerInvitation ? (
                 <>
                   You have been selected as the owner and administrator of{' '}
-                  <strong>{restaurantName ?? 'your restaurant'}</strong> on {companyName}.
+                  <strong>{getRestaurantName(restaurantName)}</strong> on {companyName}.
                 </>
               ) : (
                 <>
@@ -87,7 +102,9 @@ export const RestaurantInvitationEmail = ({
             </Text>
           </Section>
           <Section style={footer}>
-            <Text style={footerText}>This invitation expires for security reasons.</Text>
+            <Text style={footerText}>
+              This invitation expires on {formatExpiration(expiresAt)} (UTC).
+            </Text>
             <Text style={footerText}>
               Need help?{' '}
               <Link href={`mailto:${supportEmail}`} style={link}>

@@ -6,7 +6,7 @@ import {
   updateAddressRequestBodySchema,
   updateUserRequestBodySchema,
 } from '../schema/user.schema';
-import { Address, RestaurantRole, User } from '@prisma/client';
+import { Address, RestaurantOwnershipStatus, RestaurantRole, User } from '@prisma/client';
 
 export type GetAllUsersResponseBodyDTO = Omit<User, 'password'>[];
 
@@ -40,7 +40,7 @@ export type CreateRestaurantOwnerInvitationResponseBodyDTO = {
     id: string;
     restaurantId: string;
     provisioningId: string;
-    status: 'INVITED' | 'ACCEPTED';
+    status: RestaurantOwnershipStatus;
   };
   invitation: {
     id: string;

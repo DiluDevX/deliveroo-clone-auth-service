@@ -40,7 +40,7 @@ const assertReservationMatchesRequest = (
     ownership.provisioningId === input.provisioningId &&
     ownership.ownerFirstName === input.firstName &&
     ownership.ownerLastName === input.lastName &&
-    ownership.ownerEmail.toLowerCase() === input.email;
+    ownership.ownerEmail.toLowerCase() === input.email.toLowerCase();
 
   if (!matches) {
     throw new ConflictError('Restaurant ownership is already reserved with different details');
@@ -113,6 +113,15 @@ export const reserveRestaurantOwnership = async (input: ReserveRestaurantOwnersh
         return { ownership: existingOwnership, invitationCreated: false };
       }
 
+      await assertOwnerAccountCanBeReserved(transaction, input.email);
+      await transaction.restaurantInvitation.updateMany({
+        where: {
+          id: existingOwnership.invitation.id,
+          acceptedAt: null,
+          revokedAt: null,
+        },
+        data: { revokedAt: new Date() },
+      });
       const invitation = await createOwnerInvitation(transaction, input);
       const ownership = await transaction.restaurantOwnership.update({
         where: { id: existingOwnership.id },

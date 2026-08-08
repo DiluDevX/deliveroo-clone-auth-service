@@ -13,6 +13,7 @@ export const commonRequestQueryParamsSchema = z.object({
 
 export const emailSchema = z
   .string()
+  .trim()
   .min(5, 'Email is too short')
   .max(100, 'Email too long')
   .email('Invalid email format');

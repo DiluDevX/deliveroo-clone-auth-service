@@ -174,9 +174,22 @@ Stack traces are included outside production.
 - Restaurant team invitations store only a hash of the single-use token. The auth service rechecks the inviter's live membership and grantable roles for every team mutation.
 - The current actor contract supports one active restaurant membership per user. `super_admin` can grant `admin`, `finance`, and `employee`; `admin` can grant or remove only `employee`.
 - Initial restaurant ownership has a dedicated record with unique restaurant and provisioning ids.
-  Creation is serialized per restaurant and stores only a hash of the short-lived invitation token.
+  Creation for one `restaurantId` is serialized with a transaction-scoped advisory lock.
+  Duplicate `provisioningId` and normalized owner-email reservations are enforced independently by
+  database unique indexes. Only a hash of the short-lived invitation token is stored.
   The owner chooses or confirms their password during invitation acceptance; only that transaction
   creates the `super_admin` membership and marks ownership accepted.
+
+Before deploying the ownership migration, check for duplicate active owners and resolve every row
+returned before creating the partial unique index:
+
+```sql
+SELECT "restaurantId", COUNT(*)
+FROM "RestaurantUser"
+WHERE "role" = 'super_admin' AND "deletedAt" IS NULL
+GROUP BY "restaurantId"
+HAVING COUNT(*) > 1;
+```
 
 ## Smoke Test
 
