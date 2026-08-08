@@ -1,11 +1,12 @@
 import z from 'zod';
 import {
   addressRequestBodySchema,
+  createRestaurantOwnerInvitationRequestBodySchema,
   createUserRequestBodySchema,
   updateAddressRequestBodySchema,
   updateUserRequestBodySchema,
 } from '../schema/user.schema';
-import { Address, RestaurantRole, User } from '@prisma/client';
+import { Address, RestaurantOwnershipStatus, RestaurantRole, User } from '@prisma/client';
 
 export type GetAllUsersResponseBodyDTO = Omit<User, 'password'>[];
 
@@ -29,6 +30,25 @@ export type GetUserProfileResponseBodyDTO = Omit<
 export type CreateUserRequestBodyDTO = z.infer<typeof createUserRequestBodySchema>;
 
 export type CreateUserResponseBodyDTO = Omit<User, 'password'>;
+
+export type CreateRestaurantOwnerInvitationRequestBodyDTO = z.infer<
+  typeof createRestaurantOwnerInvitationRequestBodySchema
+>;
+
+export type CreateRestaurantOwnerInvitationResponseBodyDTO = {
+  ownership: {
+    id: string;
+    restaurantId: string;
+    provisioningId: string;
+    status: RestaurantOwnershipStatus;
+  };
+  invitation: {
+    id: string;
+    email: string;
+    expiresAt: Date;
+  };
+  created: boolean;
+};
 
 export type UpdateUserRequestBodyDTO = z.infer<typeof updateUserRequestBodySchema>;
 

@@ -9,6 +9,7 @@ import {
   createUserRequestBodySchema,
   updateAddressRequestBodySchema,
   updateUserRequestBodySchema,
+  createRestaurantOwnerInvitationRequestBodySchema,
 } from '../../schema/user.schema';
 import * as restaurantTeamController from '../../controllers/v1/restaurant-team.controller';
 import {
@@ -98,6 +99,14 @@ router.get(
   validateParams(idRequestPathParamsSchema),
   requireOwnerOrRoles('platform_admin'),
   userController.getSingleUser
+);
+
+router.post(
+  '/restaurant-owner-invitations',
+  authenticateJwt,
+  requireRoles('platform_admin'),
+  validateBody(createRestaurantOwnerInvitationRequestBodySchema),
+  userController.createRestaurantOwnerInvitation
 );
 
 router.post(

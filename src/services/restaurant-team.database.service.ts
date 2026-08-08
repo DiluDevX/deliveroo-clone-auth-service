@@ -1,5 +1,6 @@
 import { Prisma, RestaurantRole } from '@prisma/client';
 import { prisma } from '../config/database';
+import { ConflictError } from '../utils/errors';
 
 const memberInclude = {
   user: {
@@ -56,11 +57,10 @@ export const findPendingInvitationByEmail = (email: string) =>
     },
   });
 
-export const findInvitationByTokenHash = (tokenHash: string) =>
+export const findInvitationByTokenHashForAcceptance = (tokenHash: string) =>
   prisma.restaurantInvitation.findFirst({
     where: {
       tokenHash,
-      acceptedAt: null,
       revokedAt: null,
       expiresAt: { gt: new Date() },
     },
@@ -109,6 +109,7 @@ export const acceptInvitation = async (data: {
   email: string;
   restaurantId: string;
   role: RestaurantRole;
+  ownershipId?: string;
   existingUserId?: string;
   newUser?: {
     firstName: string;
@@ -128,7 +129,35 @@ export const acceptInvitation = async (data: {
     });
 
     if (claimedInvitation.count !== 1) {
-      return null;
+      if (!data.ownershipId) {
+        return null;
+      }
+
+      const acceptedOwnership = await transaction.restaurantOwnership.findFirst({
+        where: {
+          id: data.ownershipId,
+          invitationId: data.invitationId,
+          status: 'ACCEPTED',
+          ownerUserId: { not: null },
+        },
+      });
+      if (!acceptedOwnership?.ownerUserId) {
+        return null;
+      }
+      if (data.existingUserId !== acceptedOwnership.ownerUserId) {
+        return null;
+      }
+
+      const membership = await transaction.restaurantUser.findFirst({
+        where: {
+          restaurantId: acceptedOwnership.restaurantId,
+          userId: acceptedOwnership.ownerUserId,
+          role: 'super_admin',
+          deletedAt: null,
+        },
+        include: memberInclude,
+      });
+      return membership ? { membership, ownership: acceptedOwnership } : null;
     }
 
     const user = data.existingUserId
@@ -155,5 +184,29 @@ export const acceptInvitation = async (data: {
       include: memberInclude,
     });
 
-    return membership;
+    let ownership = null;
+    if (data.ownershipId) {
+      const acceptedOwnership = await transaction.restaurantOwnership.updateMany({
+        where: {
+          id: data.ownershipId,
+          invitationId: data.invitationId,
+          status: 'INVITED',
+        },
+        data: {
+          status: 'ACCEPTED',
+          ownerUserId: user.id,
+          acceptedAt: new Date(),
+        },
+      });
+
+      if (acceptedOwnership.count !== 1) {
+        throw new ConflictError('Restaurant ownership invitation has already been claimed');
+      }
+
+      ownership = await transaction.restaurantOwnership.findUnique({
+        where: { id: data.ownershipId },
+      });
+    }
+
+    return { membership, ownership };
   });

@@ -7,6 +7,8 @@ import type {
   DeleteUserResponseBodyDTO,
   CreateUserRequestBodyDTO,
   CreateUserResponseBodyDTO,
+  CreateRestaurantOwnerInvitationRequestBodyDTO,
+  CreateRestaurantOwnerInvitationResponseBodyDTO,
   GetUserAddressesResponseBodyDTO,
   CreateAddressRequestBodyDTO,
   CreateAddressResponseBodyDTO,
@@ -21,6 +23,7 @@ import { ConflictError, NotFoundError, UnauthorizedError } from '../../utils/err
 import { StatusCodes } from 'http-status-codes';
 import { logger } from '../../utils/logger';
 import { AuthenticatedRequest } from '../../middleware/authentication.middleware';
+import * as restaurantOwnerInvitationService from '../../services/restaurant-owner-invitation.service';
 
 const getAuthenticatedUserId = (req: unknown): string => {
   const userId = (req as AuthenticatedRequest).user?.userId;
@@ -121,6 +124,44 @@ export const createUser = async (
       { error: error instanceof Error ? error.message : 'Unknown error' },
       'Failed to create user'
     );
+    next(error);
+  }
+};
+
+export const createRestaurantOwnerInvitation = async (
+  req: Request<
+    unknown,
+    CommonResponseDTO<CreateRestaurantOwnerInvitationResponseBodyDTO>,
+    CreateRestaurantOwnerInvitationRequestBodyDTO
+  >,
+  res: Response<CommonResponseDTO<CreateRestaurantOwnerInvitationResponseBodyDTO>>,
+  next: NextFunction
+) => {
+  try {
+    const platformAdminUserId = getAuthenticatedUserId(req);
+    const result = await restaurantOwnerInvitationService.createRestaurantOwnerInvitation(
+      req.body,
+      platformAdminUserId
+    );
+
+    logger.info(
+      {
+        ownershipId: result.ownership.id,
+        restaurantId: result.ownership.restaurantId,
+        invitationId: result.invitation.id,
+        created: result.created,
+      },
+      'Restaurant owner invitation reserved'
+    );
+
+    res.status(result.created ? StatusCodes.CREATED : StatusCodes.OK).json({
+      success: true,
+      message: result.created
+        ? 'Restaurant owner invitation sent successfully'
+        : 'Restaurant ownership is already reserved',
+      data: result,
+    });
+  } catch (error) {
     next(error);
   }
 };

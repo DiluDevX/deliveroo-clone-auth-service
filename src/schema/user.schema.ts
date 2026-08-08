@@ -13,6 +13,20 @@ export const createUserRequestBodySchema = z.object({
   password: passwordSchema,
 });
 
+export const createRestaurantOwnerInvitationRequestBodySchema = z.object({
+  firstName: z.string().trim().min(1, 'First name is required').max(50, 'First name too long'),
+  lastName: z.string().trim().min(1, 'Last name is required').max(50, 'Last name too long'),
+  email: emailSchema,
+  restaurantId: z.string().trim().min(1, 'Restaurant id is required'),
+  restaurantName: z
+    .string()
+    .trim()
+    .min(1, 'Restaurant name is required')
+    .max(200, 'Restaurant name too long')
+    .regex(/^[^\p{Cc}]*$/u, 'Restaurant name contains invalid control characters'),
+  provisioningId: z.string().uuid('Provisioning id must be a valid UUID'),
+});
+
 export const updateUserRequestBodySchema = z.object({
   firstName: z.string().min(1, 'First name is required').max(50, 'First name too long').optional(),
   lastName: z.string().min(1, 'Last name is required').max(50, 'Last name too long').optional(),

@@ -3,7 +3,9 @@ import { render } from '@react-email/components';
 import { environment } from '../config/environment';
 import { InternalServerError } from '../utils/errors';
 import ResetPasswordEmail from '../emails/ResetPasswordEmail';
-import RestaurantInvitationEmail from '../emails/RestaurantInvitationEmail';
+import RestaurantInvitationEmail, {
+  buildOwnerInvitationSubject,
+} from '../emails/RestaurantInvitationEmail';
 
 const resend = new Resend(environment.mail.resendApiKey);
 
@@ -34,13 +36,17 @@ export const sendResetPasswordEmail = async (to: string, token: string) => {
 export const sendRestaurantInvitationEmail = async (
   to: string,
   token: string,
-  role: string
+  role: string,
+  expiresAt: Date,
+  restaurantName?: string
 ): Promise<void> => {
   const invitationUrl = `${environment.mail.appUrl}/account/restaurant-invitation?token=${encodeURIComponent(token)}`;
   const html = await render(
     RestaurantInvitationEmail({
       invitationUrl,
       role,
+      restaurantName,
+      expiresAt,
       companyName: environment.mail.companyName,
       supportEmail: environment.mail.supportEmail,
       logoUrl: environment.mail.logoUrl,
@@ -50,7 +56,10 @@ export const sendRestaurantInvitationEmail = async (
   const { error } = await resend.emails.send({
     from: `${environment.mail.companyName} <${environment.mail.companyEmail}>`,
     to,
-    subject: `You have been invited to join ${environment.mail.companyName}`,
+    subject:
+      role === 'super_admin'
+        ? buildOwnerInvitationSubject(restaurantName)
+        : `You have been invited to join ${environment.mail.companyName}`,
     html,
   });
 
