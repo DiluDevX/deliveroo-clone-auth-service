@@ -26,8 +26,12 @@ const acquireOwnershipReservationLock = async (
   transaction: TransactionClient,
   restaurantId: string
 ): Promise<void> => {
-  await transaction.$queryRaw<unknown[]>`
-    SELECT pg_advisory_xact_lock(hashtextextended(${restaurantId}, 0))
+  await transaction.$queryRaw<Array<{ lockAcquired: number }>>`
+    WITH ownership_lock AS (
+      SELECT pg_advisory_xact_lock(hashtextextended(${restaurantId}, 0))
+    )
+    SELECT 1::integer AS "lockAcquired"
+    FROM ownership_lock
   `;
 };
 
