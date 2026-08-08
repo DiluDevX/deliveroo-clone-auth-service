@@ -1,3 +1,10 @@
+# [1.1.0-beta.18](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.17...v1.1.0-beta.18) (2026-08-08)
+
+
+### Bug Fixes
+
+* improve ownership reservation lock query to ensure lock acquisition ([170c1a1](https://github.com/DiluDevX/deliveroo-clone-auth-service/commit/170c1a164425911ab3473fc8f1923a72f1110d71))
+
 # [1.1.0-beta.17](https://github.com/DiluDevX/deliveroo-clone-auth-service/compare/v1.1.0-beta.16...v1.1.0-beta.17) (2026-08-08)
 
 
